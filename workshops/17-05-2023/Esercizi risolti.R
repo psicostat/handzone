@@ -38,9 +38,9 @@ library(lattice)
 
 N = 20
 n_days = 8
-fixInt = 0
-fixSlope = -0.2
-randInt_sd = 1
+fixInt = 0.0
+fixSlope = 0.3
+randInt_sd = 1.0
 randSlope_sd = 0.1
 residual_sd = 0.5
 
@@ -89,11 +89,11 @@ n = seq(20,100,20)
 
 tab = expand.grid(k=k, n=n)
 
-tab$fixInt = 0
+tab$fixInt = 0.0
 tab$fixSlope = -0.5
 tab$randInt_sd = 0.3
 tab$randSlope_sd = 0.2
-tab$residual_sd = 1
+tab$residual_sd = 1.0
 
 tab$power = NA
 
@@ -155,9 +155,9 @@ ggplot(tab,aes(x=n,y=power,group=k,color=k))+
 
 N = 200
 n_days = 10
-fixInt = 0
-fixSlope = -0.2
-randInt_sd = 1
+fixInt = 0.0
+fixSlope = 0.3
+randInt_sd = 1.0
 randSlope_sd = 0.1
 residual_sd = 0.5
 
@@ -203,11 +203,11 @@ summary(fit)
 k = 10
 n_base = 20
 n_medio_aggiunto = 40
-fixInt = 0
+fixInt = 0.0
 fixSlope = -0.5
 randInt_sd = 0.3
 randSlope_sd = 0.2
-residual_sd = 1
+residual_sd = 1.0
 
 simulaStudioLab = function(idLab = NA, 
                            n = NA, 
