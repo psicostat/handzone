@@ -1,0 +1,148 @@
+---
+title: "Effect Size"
+embed-resources: true
+---
+
+```{r}
+#| message: false
+#| warning: false
+library(lme4)
+library(effectsize)
+library(emmeans)
+library(tidyverse)
+```
+
+
+## `lmer`
+
+With linear mixed-effects models, the main problem is about which standard deviation using to standardize a certain effect.
+
+```{r}
+ns <- 100
+nt <- 50
+cond <- c(0.5, -0.5)
+b0 <- 0.2
+b1 <- 0.5
+sb0 <- 0.2
+sb1 <- 0.05
+s <- 1 # residual standard deviation
+dat <- expand_grid(id = 1:ns, trial = 1:nt, cond = cond)
+
+b0i <- rnorm(ns, 0, sb0)
+b1i <- rnorm(ns, 0, sb1)
+
+dat$y <- with(dat, b0 + b0i[id] + (b1 + b1i[id]) * cond) + rnorm(nrow(dat), 0, s)
+
+fit <- lmer(y ~ cond + (cond||id), data = dat) # no correlation slopes-intercept
+summary(fit)
+```
+
+In this situation we have different options. Firstly, let's compute the standard Cohen's $d$ without considering the model:
+
+```{r}
+effectsize::cohens_d(y ~ cond, data = dat, paired = TRUE)
+effectsize::cohens_d(y ~ cond, data = dat, paired = FALSE)
+```
+
+Then we can aggregate first and then compute the $d$:
+
+```{r}
+dat |> 
+  group_by(id, cond) |> 
+  summarise(y = mean(y)) |> 
+  cohens_d(y ~ cond, data = _)
+```
+
+Here we are ignoring the uncertainty at the trial level and considering only the between-subjects differences.
+
+From the model we can directly compute these quantities:
+
+```{r}
+get_variance <- function(fit, which = NULL){
+  vv <- data.frame(VarCorr(fit))
+  vi <- vv$vcov
+  names(vi) <- tolower(ifelse(is.na(vv$var1), "residual", gsub("\\(|\\)", "", vv$var1)))
+  if(!is.null(which)){
+    sum(vi[which])
+  }else{
+    vi
+  }
+}
+
+# using residual standard deviation
+fixef(fit)["cond"] / sqrt(get_variance(fit)["residual"])
+
+# using only random (intercepts and slopes) standard deviation
+fixef(fit)["cond"] / sqrt(get_variance(fit, c("intercept", "cond")))
+
+# total variance
+fixef(fit)["cond"] / sqrt(get_variance(fit, c("intercept", "cond", "residual")))
+```
+
+Comparing it with the between-subjects Cohen's $d$ the model is essentially always computing the between version. The paired works on the differences.
+
+Some references:
+
+- https://imaging.mrc-cbu.cam.ac.uk/statswiki/FAQ/tdunpaired
+- https://psycnet.apa.org/record/2014-32656-001
+
+## `glmer`
+
+Let's see an example with a `glm`. Let's simulate data similar to the previous example but when the response is binary accuracy. The effect size now can be computed as odds ratio. The odds of a probability is calculated as $p / (1 - p)$ and is interpreted as the number of successes for each failure (or the opposite). For example, $p = 0.7$ corresponds to an odds of `r 0.7 / (1 - 0.7)`, thus `r 0.7 / (1 - 0.7)` successes for each failure. Taking the log of the odds create a symmetric function with midpoint on zero.
+
+```{r}
+odds <- function(p) p / (1 - p)
+p <- seq(0, 1, 0.01)
+par(mfrow = c(1,2))
+plot(p, odds(p), type = "l")
+plot(p, log(odds(p)), type = "l")
+```
+
+With two conditions or groups, we can compute the ratio of two odds (odds ratio) intepreted as the increase in the odds of success at the numerator compared to the denominator. The OR is an effect size that can be directly intepreted but can also be derived from other effect sizes.
+
+```{r}
+effectsize::oddsratio_to_d(OR = 3) # d associated with an OR of 3
+effectsize::d_to_oddsratio(d = 0.4) # OR for a d = 0.4
+```
+
+Now we can simulate data and see how to compute an appropriate effect size:
+
+```{r}
+dat <- expand_grid(id = 1:ns, trial = 1:nt, cond = cond)
+
+b0 <- qlogis(0.7)
+b1 <- log(2) # ~ cohen's d = 0.4
+sb0 <- 0.3
+sb1 <- 0.05
+
+b0i <- rnorm(ns, 0, sb0)
+b1i <- rnorm(ns, 0, sb1)
+
+p <- plogis(with(dat, b0 + b0i[id] + (b1 + b1i[id]) * cond))
+dat$y <- rbinom(nrow(dat), 1, p)
+
+fit <- glmer(y ~ cond + (cond|id), data = dat, family = binomial(link = "logit"))
+summary(fit)
+```
+
+Now we can estimate our effect size. Let's start by analyzing accuracies using a linear model:
+
+```{r}
+dat |> 
+  group_by(id, cond) |> 
+  summarise(y = mean(y)) |> 
+  effectsize::cohens_d(y ~ cond, paired = TRUE, data = _)
+
+dat |> 
+  group_by(id, cond) |> 
+  summarise(y = mean(y)) |> 
+  effectsize::cohens_d(y ~ cond, paired = FALSE, data = _)
+```
+
+Now let's transform the model coefficient into a Cohen's $d$:
+
+```{r}
+exp(fixef(fit)) # odds ratio
+effectsize::logoddsratio_to_d(fixef(fit)["cond"])
+```
+
