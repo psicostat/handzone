@@ -1,0 +1,44 @@
+---
+title: "Intro to effect size"
+subtitle: "size matters"
+author: "work in progress @ psicostat"
+date: "February 2nd, 2024"
+output: html_document
+---
+\raggedright
+\break\break
+
+```{r setup-knitr, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+
+```
+
+xx
+
+--------------------------------------------
+--------------------------------------------
+
+### Initial general setup
+
+```{r setup-general} 
+rm(list=ls())
+library(ggplot2)
+library(MASS)
+```
+
+--------------------------------------------
+--------------------------------------------
+
+## xx
+
+xx
+
+```{r xx, cache=T}
+x = rnorm(10)
+plot(x)
+```
+
+xx
+
+--------------------------------------------
+--------------------------------------------
