@@ -10,13 +10,7 @@ output: html_document
 
 ```{r setup-knitr, include=FALSE} 
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
-
 ```
-
-xx
-
---------------------------------------------
---------------------------------------------
 
 ### Initial general setup
 
@@ -24,21 +18,93 @@ xx
 rm(list=ls())
 library(ggplot2)
 library(MASS)
+ts=25
 ```
 
---------------------------------------------
---------------------------------------------
+----------------------------------------------------------------------------------------
 
-## xx
+----------------------------------------------------------------------------------------
 
-xx
+----------------------------------------------------------------------------------------
 
-```{r xx, cache=T}
-x = rnorm(10)
-plot(x)
+
+# Correlation
+
+Example of scatter plot featuring a correlation of exactly **` r = 0.40`**. 
+
+It can be understood as a +1.00 *SD* increase in one variable corresponding to an estimated +0.40 *SD* increase in the other one. 
+
+Standardized regression coefficient in a linear model (continuous predictor) can be interpreted in a similar fashion. 
+
+```{r figure-correlation, cache=T, echo=FALSE, out.width="75%", fig.asp=0.7}
+r = .40
+df = data.frame(mvrnorm(n=1000,mu=c(0,0),Sigma=matrix(c(1,r,r,1),2,2),empirical=T))
+ggplot(df,aes(x=X1,y=X2))+
+  geom_point(size=3,alpha=.4,color="blue")+
+  geom_smooth(method="lm",color="blue",size=2)+
+  coord_cartesian(ylim=c(-2,2),xlim=c(-2,2))+
+  scale_x_continuous(breaks=seq(-4,4,.50))+
+  scale_y_continuous(breaks=seq(-4,4,.40))+
+  theme(text=element_text(size=ts*0.7))+
+  xlab("X1 (z-score)")+ylab("X2 (z-score)")+
+  geom_vline(xintercept=c(0,1),linetype=2,size=1)+
+  geom_hline(yintercept=c(0,.40),linetype=2,size=1)
 ```
 
-xx
+----------------------------------------------------------------------------------------
 
---------------------------------------------
---------------------------------------------
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+# Standardized Mean Difference
+
+SMDs (e.g., Cohen's d, possibly with Hedges' correction for small samples) are reported to compare group average values on a standardized metric. Here is an example of **`Cohen's d = 1.50`** between "<span style="color:darkgreen;">**population green**</span>" and "<span style="color:purple;">**population purple**</span>".
+
+```{r figure-example-SMD, cache=T, echo=FALSE, out.width="75%", fig.asp=0.55}
+ggplot()+
+  scale_x_continuous(limits=c(-3,4),breaks=seq(-4,4,.50))+
+  ylab("Density")+xlab("X1 (z-score)")+
+  theme(text=element_text(size=ts*0.75),axis.text.y=element_blank())+
+  geom_vline(xintercept=c(0,1.5),linetype=2,size=1)+
+  stat_function(fun=dnorm,n=200,color="purple",size=2,args = list(mean = 1.50))+
+  stat_function(fun=dnorm,n=200,color="darkgreen",size=2)
+```
+
+Height is commonly used for offering examples to understand SMDs, because it is an immediately visible, non-latent, more or less normally-distributed trait. For example, from *Funder and Ozer (2019)*:
+
+```{r figure-Cohen-height-text, cache=T, echo=FALSE, out.width="50%"}
+knitr::include_graphics("Figures/Figure-Cohen-height-text.png")
+```
+
+Is it true? Here is the WHO data with growth curves in height. In fact, it looks like there is no change at all between 16- and 17-year-old girls. 
+
+```{r figure-height, cache=T, echo=FALSE, out.width="75%"}
+load("Figures/Figure-height.RData")
+gt
+```
+
+... and here is a shiny app for producing plots and computing effect sizes based on those data. 
+
+https://enricotoffalini.shinyapps.io/Dati_altezza_WHO/
+
+Indeed, for 16- vs 17-year-old girls we get **`Cohen's d = 0.05`**, which is not "small", it's practically negligible.
+
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+# Correlation and Cohen's d can be transformed into each other
+
+
+
+
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
