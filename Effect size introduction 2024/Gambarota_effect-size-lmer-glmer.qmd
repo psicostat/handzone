@@ -85,6 +85,7 @@ Some references:
 
 - https://imaging.mrc-cbu.cam.ac.uk/statswiki/FAQ/tdunpaired
 - https://psycnet.apa.org/record/2014-32656-001
+- http://steveharoz.com/blog/2023/simulating-how-replicate-trial-count-impacts-cohens-d-effect-size/
 
 ## `glmer`
 
