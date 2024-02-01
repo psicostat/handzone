@@ -1,7 +1,7 @@
 ---
 title: "Intro to effect size"
 subtitle: "size matters"
-author: "work in progress @ psicostat"
+author: "work in progress / enrico toffalini @ psicostat"
 date: "February 2nd, 2024"
 output: html_document
 ---
@@ -12,7 +12,7 @@ output: html_document
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 ```
 
-### Initial general setup
+### Initial setup
 
 ```{r setup-general} 
 rm(list=ls())
@@ -165,7 +165,7 @@ Example by *Funder and Ozer (2019)* of a very small correlation for a single eve
 
 → Other example: "*very small*" treatment effect... but what happens if that *very small* effect acts every single day in the life of a person?
 
-```{r hidden-code-example-very-small-effect, cache=T, echo=FALSE, include=FALSE}
+```{r hidden-code-example-very-small-effect, cache=FALSE, echo=FALSE, include=FALSE}
 r = .09
 df = data.frame(mvrnorm(n=1e6,mu=c(0,0),Sigma=matrix(c(1,r,r,1),2,2),empirical=T))
 outcome1 = rbinom(nrow(df),1,pnorm(df$X2))

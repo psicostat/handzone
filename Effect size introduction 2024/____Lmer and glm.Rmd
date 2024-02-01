@@ -1,0 +1,207 @@
+---
+title: "Effect size: lmer and glm/glmer"
+subtitle: "size matters"
+author: "work in progress / enrico toffalini @ psicostat"
+date: "February 2nd, 2024"
+output: html_document
+---
+\raggedright
+\break\break
+
+```{r setup-knitr, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+### Initial setup
+
+```{r setup-general} 
+rm(list=ls())
+library(lme4)
+library(effects)
+library(ggplot2)
+library(MASS)
+ts=25
+```
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+
+# Repeated measures
+
+Let's consider this simple illustrative case with N = 16 divided into two conditions, with each subject providing k = 10 observed responses, all different. With a mixed-model we could model responses like this: 
+**`fit = lmer(score ~ Condition + (1|id), data = df)`**.
+
+If we should report a standardized effect size (i.e., SMD, Cohen's d), how do we compute it?
+
+```{r figure-repeated-measures, cache=T, echo=FALSE, out.width="80%", fig.asp=0.7}
+set.seed(10)
+N = 8
+k = 10
+rInt = rep(rnorm(N*2,0,1),each=k)
+Condition = rep(c("cond.1","cond.2"),each=N*k)
+eff = rep(c(0,0.25),each=N*k)
+id = rep(letters[1:(N*2)],each=k)
+df = data.frame(id,Condition,score=rInt+eff+rnorm(N*k*2,0,1.5))
+fit = lmer(score~Condition+(1|id),data=df)
+re = ranef(fit)$id
+fe = fixef(fit)
+cond = rep(NA,nrow(re))
+for(i in 1:nrow(re)){
+  cond[i] = df$Condition[df$id==rownames(re)[i]][1]
+  if(cond[i]=="cond.1") re$`(Intercept)`[i] = re$`(Intercept)`[i] + fe[1]
+  if(cond[i]=="cond.2") re$`(Intercept)`[i] = re$`(Intercept)`[i] + fe[1] + fe[2]
+}
+re = data.frame(id=rownames(re),Condition=cond,score=re$`(Intercept)`)
+pd = position_dodge(width=.5)
+ggplot(df,aes(x=Condition,y=score,color=id,group=id))+
+  geom_point(data=re,size=6,position=pd,shape=23,fill="white",stroke=1.5)+
+  geom_point(size=3.5,alpha=.4,position=pd)+
+  scale_y_continuous(breaks=seq(-10,10,1))+
+  theme(text=element_text(size=ts),legend.title=element_text(size=ts*.4),legend.text=element_text(size=ts*.4))
+
+cdTot = effsize::cohen.d(df$score~df$Condition)
+cdBetw = effsize::cohen.d(re$score~re$Condition)
+```
+
+If we consider all observed responses (small circles, which include both within- and between-subject variance) we get: **`r paste("Cohen's d =", format(round(cdTot$estimate,2),nsmall=2))`**
+
+However, if we consider only the (model-estimated, unobserved) true subject scores (diamonds, which include only between-subject variance) we get: **`r paste("Cohen's d =", format(round(cdBetw$estimate,2),nsmall=2))`**
+
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+
+# GLM: Poisson (with Gamma it's more or less the same)
+
+Let's model a discrete count variable such as reading errors. Age is the predictor. Reading errors monotonously decrease throughout primary school. However, decrease is not linear: it smoothly converges towards zero, and M and SD are related. 
+
+We had already talked about the problem here: **https://www.memoryandlearninglab.it/wp-content/uploads/2023/10/glm_e_overdispersion3.html**
+
+```{r figure-poisson, cache=T, echo=FALSE, out.width="75%", fig.asp=0.7}
+set.seed(0)
+
+N = 500
+id = 1:N
+age = runif(N,min=6,max=11)
+errors = rpois(N, exp(5-age*.64+rnorm(N,0,.08)))
+
+df = data.frame(id,age,errors)
+fit = glmer(errors~age+(1|id),data=df,family="poisson")
+eff = data.frame(allEffects(fit,xlevels=list(age=seq(6,11,.1)))$"age")
+
+xs = 6:11
+ys = eff$fit[eff$age %in% xs]
+  
+ggplot(df,aes(x=age,y=errors))+
+  geom_vline(xintercept=xs,linetype=2,size=0.7,color="#888888")+
+  geom_hline(yintercept=ys,linetype=2,size=0.7,color="#888888")+
+  geom_point(size=3.5,alpha=.4,color="blue")+
+  scale_x_continuous(breaks=seq(0,100,.5))+
+  scale_y_continuous(breaks=seq(0,10,1))+
+  geom_line(data=eff,aes(y=fit),size=2,color="darkblue")+
+  geom_ribbon(data=eff,aes(y=fit,ymin=lower,ymax=upper),alpha=.2,fill="darkblue")+
+  xlab("Age (years)")+ylab("Errors")+
+  theme(text=element_text(size=ts*0.7))
+
+# incorrect linear model
+lineardecrease = lm(errors~age,data=df)$coefficients["age"]
+
+# get correct model estimates
+percentdecrease1 = exp(fit@beta[2])
+percentdecrease2 = exp(fit@beta[2]*2)
+
+```
+
+The mean linear decrease is about -**`r format(round(lineardecrease,2),nsmall=2)`** errors *per year*, so **every two years we should observe a decrease of about `r format(round(lineardecrease,2)*2,nsmall=2)` reading errors**.
+
+However... from **`r xs[1]`** to **`r xs[2]`** years we get an expected decrease of **`r format(round(ys[2]-ys[1],2),nsmall=2)`** reading errors, whereas from **`r xs[2]`** to **`r xs[3]`** we get an expected decrease of **`r format(round(ys[3]-ys[2],2),nsmall=2)`** reading errors.
+
+So, what remain constant? What can be reported as a meaningful effect size? It's the percentage of reduction of reading errors *per time unit*. 
+
+**Every +1 year**, the expected number of remaining reading errors is **`r paste0(round(100*percentdecrease1),"%")`** compared to the expected number of the previous year. **After +2 years, the expected number of remaining reading errors is `r paste0(round(100*percentdecrease2),"%")` compared to the previous observation**. These decreases are **constant over time**.
+
+How do we get these estimates? Let's have a look at the Poisson model summary:
+
+```{r}
+summary(fit)
+```
+
+The estimate for **`age`** is **`r format(round(fit@beta[2],2),nsmall=2)`**.
+
+The effect on the linear scale **per +1 year** is **`exp(age)`** that is **`r format(round(exp(fit@beta[2]),2),nsmall=2)`**, so the percentage is **`r round(exp(fit@beta[2])*100)`**% (i.e., remaining percentage of reading errors after every year).
+
+**Per +2 years** we calculate **`exp(age*2)`**, that is **`r format(round(exp(fit@beta[2]*2),2),nsmall=2)`**, thus a remaining percentage of **`r round(exp(fit@beta[2]*2)*100)`**%.
+
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+
+# Binomial regression
+
+Let's model a discrete sum score variable measuring solved math problems out of 15 in a task. Accuracy ranges from 0% (sum score = 0) to 100% (sum score = 15). Age is the predictor. Accuracy monotonously increase throughout primary school. However, increase is not linear: it is constrained between two extreme bounds, and "fastest" in the middle, and once again M and SD are related. 
+
+```{r figure-binomial, cache=T, echo=FALSE, out.width="75%", fig.asp=0.7}
+set.seed(0)
+
+N = 500
+id = 1:N
+age = runif(N,min=6,max=11)
+sumscore = rbinom(N, 15, pnorm(0.4+scale(age)*1.8+rnorm(N,0,.9)))
+
+df = data.frame(id,age,errors)
+fit = glmer(cbind(sumscore,15-sumscore)~age+(1|id),data=df,family="binomial")
+eff = data.frame(allEffects(fit,xlevels=list(age=seq(6,11,.1)))$"age")
+
+ggplot(df,aes(x=age,y=sumscore))+
+  geom_point(size=3.5,alpha=.4,color="blue")+
+  scale_x_continuous(breaks=seq(0,100,.5))+
+  scale_y_continuous(breaks=seq(0,15,1))+
+  geom_line(data=eff,aes(y=fit*15),size=2,color="darkblue")+
+  geom_ribbon(data=eff,aes(y=fit*15,ymin=lower*15,ymax=upper*15),alpha=.2,fill="darkblue")+
+  xlab("Age (years)")+ylab("Sum score")+
+  theme(text=element_text(size=ts*0.7))
+
+# incorrect linear model
+linearincrease = lm(sumscore~age,data=df)$coefficients["age"]
+
+# get correct model estimates
+oddsratio = exp(fit@beta[2])
+
+```
+
+The linear increase *per year* is about +**`r format(round(linearincrease,2),nsmall=2)`** correctly solved math problems... this is not incorrect, but clearly inaccurate when close to the bounds.
+
+A better estimate is the ***Odds Ratio***, which here is **`r format(round(oddsratio,2),nsmall=2)`**. This is an appropriate effect size index for binomial regressions. But how is it interpreted?
+
+Every +1 year of age, the **odds** of correctly solving a problem is **`r format(round(oddsratio,2),nsmall=2)` times the odds of the year before**.
+
+How do we get this estimate? Let's have a look at the Binomial model summary:
+
+```{r}
+summary(fit)
+```
+
+The estimate for **`age`** is **`r format(round(fit@beta[2],2),nsmall=2)`**.
+
+The ***Odds Ratio*** is **`exp(age)`** that is **`r format(round(exp(fit@beta[2]),2),nsmall=2)`**. 
+
+**Note that the *Odds Ratio* depends on the "age" metrics, which is expressed in years: with age in months, we would get a different estimate. Specifically, it would be `r format(round(exp(fit@beta[2]),2),nsmall=2)``^(1/12)` = `r format(round(exp(fit@beta[2])^(1/12),2),nsmall=2)`**
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
