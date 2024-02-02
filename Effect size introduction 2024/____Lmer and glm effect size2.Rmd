@@ -20,6 +20,7 @@ library(lme4)
 library(effects)
 library(ggplot2)
 library(MASS)
+compact = function(x,digits=2){return(format(round(x,digits),nsmall=digits))}
 ts=25
 ```
 
@@ -30,7 +31,7 @@ ts=25
 ----------------------------------------------------------------------------------------
 
 
-# Repeated measures
+# SMDs with repeated measures / mixed-models
 
 Let's consider this simple illustrative case with N = 16 divided into two conditions, with each subject providing k = 10 observed responses, all different. With a mixed-model we could model responses like this: 
 **`fit = lmer(score ~ Condition + (1|id), data = df)`**.
@@ -58,18 +59,35 @@ for(i in 1:nrow(re)){
 re = data.frame(id=rownames(re),Condition=cond,score=re$`(Intercept)`)
 pd = position_dodge(width=.5)
 ggplot(df,aes(x=Condition,y=score,color=id,group=id))+
-  geom_point(data=re,size=6,position=pd,shape=23,fill="white",stroke=1.5)+
-  geom_point(size=3.5,alpha=.4,position=pd)+
+  geom_point(data=re,size=6,position=pd,shape=23,fill="white",stroke=1.8)+
+  geom_point(size=4,alpha=.5,position=pd)+
   scale_y_continuous(breaks=seq(-10,10,1))+
   theme(text=element_text(size=ts),legend.title=element_text(size=ts*.4),legend.text=element_text(size=ts*.4))
 
 cdTot = effsize::cohen.d(df$score~df$Condition)
 cdBetw = effsize::cohen.d(re$score~re$Condition)
+
+su = summary(fit)
+raw = su$coefficients["Conditioncond.2","Estimate"]
+resSD = sqrt(data.frame(su$varcor)[2,"vcov"])
+idSD = sqrt(data.frame(su$varcor)[1,"vcov"])
 ```
 
-If we consider all observed responses (small circles, which include both within- and between-subject variance) we get: **`r paste("Cohen's d =", format(round(cdTot$estimate,2),nsmall=2))`**
+If we consider all observed responses (small circles, which include both within- and between-subject variance) we get: **`r paste("Cohen's d =", compact(abs(cdTot$estimate)))`**
 
-However, if we consider only the (model-estimated, unobserved) true subject scores (diamonds, which include only between-subject variance) we get: **`r paste("Cohen's d =", format(round(cdBetw$estimate,2),nsmall=2))`**
+However, if we consider only the (model-estimated, unobserved) true subject scores (diamonds, which include only between-subject variance) we get: **`r paste("Cohen's d =", compact(abs(cdBetw$estimate)))`**
+
+How do we estimate the second Cohen's d using ONLY the model parameters in the summary? Let's see the summary:
+
+```{r summary-lmer-for-smd}
+summary(fit)
+```
+
+We may divide the "raw coefficient" by either the total SD, or only by the estimated between-subject (id) SD:
+
+→ For total variance/SD: **`r compact(raw)` / sqrt(`r compact(idSD)`^2^ + `r compact(resSD)`^2^) = `r compact(raw / sqrt(idSD^2+resSD^2))`**
+
+→ For estimated between-subject SD only: **`r compact(raw)` / `r compact(idSD)` = `r compact(raw / idSD)`**
 
 
 ----------------------------------------------------------------------------------------
