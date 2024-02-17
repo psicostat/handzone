@@ -2,7 +2,7 @@
 title: "Interaction and effect size"
 subtitle: "size matters"
 author: "work in progress / enrico toffalini @ psicostat"
-date: "February 21st, 2024"
+date: "February 21^st^, 2024"
 output: html_document
 ---
 \raggedright
@@ -24,6 +24,7 @@ load("interaction_datasets.RData")
 tsz=25
 ```
 
+Fully open code at: https://github.com/psicostat/workshops/tree/main/Interaction%20introduction%202024
 
 ----------------------------------------------------------------------------------------
 
