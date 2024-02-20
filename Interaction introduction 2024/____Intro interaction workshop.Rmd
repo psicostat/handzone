@@ -50,8 +50,19 @@ Anyways... what does that mean in actual interactions? The problem is that there
 
 All examples below will present about Cohen's *f* ≈ 0.25 (Cohen's *f* ^2^ ≈ 0.06). 
 
+This is also a useful resource: https://lakens.github.io/statistical_inferences/06-effectsize.html#effect-sizes-for-interactions
+
+```{r figure-lakens, cache=T, echo=FALSE, out.width="100%", fig.asp=0.7}
+knitr::include_graphics("Figures/Lakensparagraph.png")
+```
+
 
 ----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
 
 ### Example: Fully crossed interaction (2 x 2)
 
@@ -89,6 +100,11 @@ But... a simpler way to understand the above effect may be via Standardized Mean
 
 ----------------------------------------------------------------------------------------
 
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+
 ### Example: Treatment-like effect (2 x 2)
 
 Imagine a situation like a treated-vs-control-group experiment with pre-test and post-test. In one condition (w = 0) x has not effect over y, while in the other (w = 1) x has a clearly visible effect over y. The interaction coefficients tells you (as usual) the difference-between-differences across conditions. 
@@ -125,6 +141,11 @@ But note how much the effects must vary across conditions to get there:
 
 
 ----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
 
 ### Example: Treatment-like effect (2 x 3)
 
@@ -165,6 +186,28 @@ But note how much the effects must vary across conditions to get there:
 
 ----------------------------------------------------------------------------------------
 
+Let's try <a href="https://cran.r-project.org/web/packages/Superpower/vignettes/intro_to_superpower.html" target="_blank">**Superpower**</a> on this case, with some "plausible" assumptions:
+
+``` {r superpower-2, cache=T}
+# devtools::install_github("arcaldwell49/Superpower")
+library(Superpower)
+(design = ANOVA_design(design="3w*2b",
+             n=30/2,
+             mu=c(.00,.00,1.30,.30,1.20,.10),
+             sd=1,
+             r=.50)
+)
+pow = ANOVA_power(design)
+```
+
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+
 ### Example: Group moderate continuous effect (2 x continuous)
 
 Imagine studying how a relationship between x and y is different across two populations. 
@@ -197,6 +240,11 @@ But note how much the effects must vary across conditions to get there:
 
 
 ----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
 
 ### Example: Continuous relationship moderated by another continuous variable (continuous x continuous)
 
