@@ -1,0 +1,148 @@
+---
+title: "Interaction or Simpler main effect?"
+subtitle: "sometimes, with within-subject factors (modelling random intercepts for subjects), interactions may even gain power"
+author: "work in progress / enrico toffalini @ psicostat"
+date: "February 21^st^, 2024"
+output: html_document
+---
+\raggedright
+\break\break
+
+```{r setup-knitr, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+### Initial setup
+
+```{r setup-general} 
+rm(list=ls())
+library(ggplot2)
+library(effects)
+library(glmmTMB)
+library(performance)
+rnd = function(x,digits=2){ return(format(round(x,digits),nsmall=digits)) }
+tsz=25
+```
+
+Fully open code at: https://github.com/psicostat/workshops/tree/main/Interaction%20introduction%202024
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+
+# EXAMPLE: TREATMENT INTERACTION EFFECT
+
+Let's simulate a simple 2B x 2W (group [control vs treated] x time [pre vs post]) interaction that is treatment-like. First, I simulate a total of 20,000 subjects just to check that everything is ok with the model. I simulate the data in such a way that the effect on the overall standardized scale is d = 0.40 and the intraclass-correlation (ICC) is 0.65 (both these data will be important for power). 
+
+```{r data-simulation-1, cache=T}
+set.seed(0)
+N = 2e4
+id = rep(1:N,times=2)
+rInt = rep(rnorm(N,0,.806),times=2)
+time = rep(c(0,1),each=N)
+group = rep(c(0,1),each=N/2,times=2)
+residual = rnorm(N*2,0,.592)
+outcome = 0 + 0*time + 0*group + 0.40*time*group + rInt + residual
+
+time = as.factor(time)
+group = as.factor(group)
+
+df = data.frame(id,time,group,outcome)
+
+fit1 = glmmTMB(outcome ~ time * group + (1|id), data=df)
+plot(allEffects(fit1), multiline=T, ylim=c(-0.05,0.45))
+
+summary(fit1)
+
+performance::icc(fit1)
+```
+
+Now let's perform an actual power analysis simulation (1,000 iterations). Let's say that our real (resource-constrained) N = 150, to be divided into the two groups. 
+
+Because the interaction is simple (2 x 2) and it is described by one single interaction coefficient, the power can be directly computed on that interaction coefficient.
+
+```{r power-simulation-lmm, cache=T}
+set.seed(0)
+
+N = 150
+id = rep(1:N,times=2)
+time = rep(c(0,1),each=N)
+group = rep(c(0,1),each=N/2,times=2)
+
+niter = 1000
+p = rep(NA,niter)
+
+for(i in 1:niter){
+    rInt = rep(rnorm(N,0,.806),times=2)
+    residual = rnorm(N*2,0,.592)
+    outcome = 0 + 0*time + 0*group + 0.40*time*group + rInt + residual
+
+    df = data.frame(id,time,group,outcome)
+    df$time = as.factor(df$time)
+    df$group = as.factor(df$group)
+
+    fit1 = glmmTMB(outcome ~ time * group + (1|id), data=df)
+    p[i] = summary(fit1)$coefficients$cond["time1:group1","Pr(>|z|)"]
+    # print(mean(p < 0.05, na.rm=T))
+}
+mean(p < 0.05, na.rm=T)
+
+```
+
+So, the estimated power is **``r rnd(mean(p < 0.05, na.rm=T))``**
+
+
+----------------------------------------------------------------------------------------
+
+
+### Now, what if I ignore the pre-test measures and only compare the two groups at post-test?
+
+This is equivalent to a simple t-test or a one-way ANOVA.
+
+Actually, I lose power. The reason is that I am no longer modelling the inter-individual variability via random intercepts. This variability continues to exist, but not being account in the model, it ends up adding to the residual Sigma, which dampens power. 
+
+```{r power-simulation-simple-comparison, cache=T}
+set.seed(0)
+
+N = 150
+id = rep(1:N,times=2)
+time = rep(c(0,1),each=N)
+group = rep(c(0,1),each=N/2,times=2)
+
+niter = 1000
+p = rep(NA,niter)
+
+for(i in 1:niter){
+    rInt = rep(rnorm(N,0,.806),times=2)
+    residual = rnorm(N*2,0,.592)
+    outcome = 0 + 0*time + 0*group + 0.40*time*group + rInt + residual
+
+    df = data.frame(id,time,group,outcome)
+    df$time = as.factor(df$time)
+    df$group = as.factor(df$group)
+
+    fit1 = lm(outcome ~ group, data=df[df$time==1, ])
+    p[i] = summary(fit1)$coefficients["group1","Pr(>|t|)"]
+    
+    # print(mean(p < 0.05, na.rm=T))
+}
+mean(p < 0.05, na.rm=T)
+
+```
+
+So, now the estimated power is down to **``r rnd(mean(p < 0.05, na.rm=T))``**
+
+
+### IMPORTANT: this is not always true
+
+Empirically, I've just tested that all this emerges (or at least, it becomes appreciable) when ICC > 0.50 (that is, when more observed variance is accounted for by inter-individual variability than by residual variability). 
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------
+
