@@ -2,20 +2,20 @@
 
 ### 2023-05-17 - Simulazione LMM and Multilab
 
-- [Slides](materials/2023-05-17/Slide simulazione multilab.pdf)
-- [Script](materials/2023-05-17/Simulazione LMM e Multilab study.R)
-- [Esercizi](materials/2023-05-17/Esercizi risolti.R)
+- [Slides](<materials/2023-05-17/Slide simulazione multilab.pdf>)
+- [Script](<materials/2023-05-17/Simulazione LMM e Multilab study.R>)
+- [Esercizi](<materials/2023-05-17/Esercizi risolti.R>)
 
 ### 2023-06-14 - Bayesian models
 
-- [Slides](materials/2023-06-14/brms e modelli 2023_06_14.pdf)
-- [Script](materials/2023-06-14/bayesian workshop 2023_06_14.R)
+- [Slides](<materials/2023-06-14/brms e modelli 2023_06_14.pdf>)
+- [Script](<materials/2023-06-14/bayesian workshop 2023_06_14.R>)
 
 ### 2023-06-29 - Permutation testing
 
-- [Slides 1](materials/2023-06-29/1. Finos - Permutation Testing.pdf)
-- [Slides 2](materials/2023-06-29/2. Finos - Permutation Testing Repeated Measures.pdf)
-- [Slides 3](materials/2023-06-29/3. Finos - Permutation Testing Covariates.pdf)
+- [Slides 1](<materials/2023-06-29/1. Finos - Permutation Testing.pdf>)
+- [Slides 2](<materials/2023-06-29/2. Finos - Permutation Testing Repeated Measures.pdf>)
+- [Slides 3](<materials/2023-06-29/3. Finos - Permutation Testing Covariates.pdf>)
 
 ### 2024-02-02 - Effect size for lmer and glm
 
