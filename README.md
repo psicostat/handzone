@@ -6,8 +6,8 @@
 
 ### 2024-02-21 - Effect size for interactions
 
-- [html 1](materials/2024-02-21/____Intro-interaction-workshop.html)
-- [html 2](materials/2024-02-21/____Intro-interaction-workshop.html)
+- [html 1](materials/2024-02-21/Intro-interaction-workshop.html)
+- [html 2](materials/2024-02-21/interaction-or-simpler-effect.html)
 
 ### 2024-02-02 - Effect size for lmer and glm
 
