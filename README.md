@@ -11,8 +11,8 @@
 
 ### 2024-02-02 - Effect size for lmer and glm
 
-- [html 1](materials/2024-02-02/____Intro-effect-size4.html)
-- [html 2](materials/2024-02-02/____Lmer-and-glm-effect-size2.html)
+- [html 1](materials/2024-02-02/Intro-effect-size4.html)
+- [html 2](materials/2024-02-02/Lmer-and-glm-effect-size2.html)
 
 ### 2023-06-29 - Permutation testing
 
