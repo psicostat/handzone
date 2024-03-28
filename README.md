@@ -1,5 +1,11 @@
 # Psicostat Workshops
 
+### 2024-03-28 - Intro to Multilevel CFA
+
+- [Multilevel Confirmatory Factor Analysis: An introduction with examples and code (slides)](<materials/2024-03-28/MCFA-intro.pdf>)
+
+- [Rmd code](<materials/2024-03-28/Rmd code.zip>)
+
 ### 2024-03-07 - Power analysis multilevel logistic regression
 
 - [Power Analysis via Monte Carlo simulation on Chicks Numerical Abilities](materials/2024-03-07/power-analysis-chicks.html)
