@@ -1,0 +1,100 @@
+---
+title: "Example of using embeddings computed from a (small) model on hugging face"
+subtitle: "x handZone psicostat"
+format: html
+execute:
+  python: C:/Users/enric/miniconda3/python.exe
+  warning: false    # Suppress warnings
+  message: false    # Suppress messages
+  error: false      # Suppress errors
+---
+<!--   reticulate::repl_python()   -->
+
+## 1. Import and visualize data
+
+```{python}
+# import packages
+import numpy as np
+import pandas as pd
+
+# Define path to data, import and visualize data
+input_datapath = "C:/Users/enric/Documents/PSICOSTAT/AI meeting 2024_05_22/" 
+df = pd.read_csv(input_datapath+"Toy_dataset.csv", sep=',') 
+df
+```
+
+## 2. Get embeddings
+
+Now the **core part**!
+
+```{python}
+# import packages/functions
+from sentence_transformers import SentenceTransformer
+
+# load a (small) model available on hugging face 
+model = SentenceTransformer("avsolatorio/GIST-small-Embedding-v0")
+
+# Compute embeddings on item texts in dataframe
+embeddings = model.encode(df["Testo"], convert_to_tensor=True)
+```
+
+## 3. Visualize embeddings
+
+```{python}
+# print embedding values
+print(embeddings)
+
+# see dimensions of the embeddings
+embeddings.shape
+```
+
+## 4. Compute cosine similarities
+
+```{python}
+# import packages/functions
+import torch.nn.functional as F
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Compute cosine-similarity for each pair of sentences
+scores = F.cosine_similarity(embeddings.unsqueeze(1), embeddings.unsqueeze(0), dim=-1)
+
+# visualize matrix of similarities
+print(scores.cpu().numpy().round(decimals=3))
+```
+
+## 5. Lastly, plot items on 2D obtained via multimensional scaling
+
+```{python}
+# import packages/functions
+import matplotlib.pyplot as plt
+import adjustText
+from sklearn.manifold import TSNE
+
+# compute multidimensional scaling reducing to 2D
+tsne = TSNE(n_components=2, perplexity=5, random_state=42, init='random', learning_rate=200)
+vis_dims = tsne.fit_transform(np.array(scores))
+
+# extract x, y coordinates for all data points
+x = [x for x,y in vis_dims]
+y = [y for x,y in vis_dims]
+
+# define color, dot shape, and other parameters
+colors = df["Color"]
+marker = df["DotShape"]
+scalename = df["Scale"]
+text = df["Item"]+" :"+df["Testo"]
+    
+# plot basic graph
+font = {'size' : 10}
+plt.figure(figsize=(9, 7))
+plt.rcParams['figure.dpi'] = 600
+for _markers, _colors, _name,_x, _y in zip(marker, colors, scalename, x, y):
+   plt.scatter(_x, _y, s=80, alpha=0.7, marker=_markers, c=_colors, label=_name)
+# add legend
+handles, labels = plt.gca().get_legend_handles_labels()
+by_label = dict(zip(labels, handles))
+plt.legend(by_label.values(), by_label.keys(), loc='upper center', bbox_to_anchor=(1, 1), fontsize=8)
+# add labels and adjust their positions
+texts = [plt.text(x[i], y[i], text[i], ha='center', va='center', **font) for i in range(len(text))]
+adjustText.adjust_text(texts,expand_text=(0.9,0.9))
+```

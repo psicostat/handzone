@@ -1,0 +1,13 @@
+Item,Testo,Scale,Color,DotShape
+X1,I make plans to achieve my goals,conscientiousness,blue,o
+X2,I organize my daily tasks,conscientiousness,blue,o
+X3,I am punctual and reliable,conscientiousness,blue,o
+X4,I approach tasks with careful attention,conscientiousness,blue,o
+X5,I demonstrate perseverance and dedication,conscientiousness,blue,o
+X6,I need to keep every aspect of my life under strict control,conscientiousness,blue,o
+X7,I worry about many aspects of life,neuroticism,red,X
+X8,I often feel distressed,neuroticism,red,X
+X9,I dwell on negative experiences,neuroticism,red,X
+X10,"If faced with uncertainty, I feel anxious",neuroticism,red,X
+X11,I struggle to regain control of my emotions,neuroticism,red,X
+X12,"When confronted with situations that deviate from my plans, I feel confused",neuroticism,red,X

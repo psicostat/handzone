@@ -1,0 +1,75 @@
+---
+title: "Simple Computations in Python"
+format: html
+execute:
+  python: C:/Users/enric/miniconda3/python.exe
+---
+
+
+# Simple Computations in Python
+
+In this document, we will perform a few simple computations using Python.
+
+## Computation 1: Addition
+
+Let's add two numbers.
+
+```{r include=F}
+reticulate::repl_python()
+```
+
+```{python cache=T}
+import numpy as np
+import pandas as pd
+import torch.nn.functional as F
+from sentence_transformers import SentenceTransformer
+import matplotlib.pyplot as plt
+import adjustText
+from sklearn.manifold import TSNE
+from sklearn.metrics.pairwise import cosine_similarity
+
+input_datapath = "C:/Users/enric/Documents/PSICOSTAT/AI meeting 2024_05_22/" # Path to data
+df = pd.read_csv(input_datapath+"Toy_dataset.csv", sep=',') 
+
+model = SentenceTransformer("avsolatorio/GIST-small-Embedding-v0", revision=None)
+
+texts = df["Testo"]
+
+# Compute embeddings
+embeddings = model.encode(texts, convert_to_tensor=True, batch_size=3)
+embeddings.shape
+
+# Compute cosine-similarity for each pair of sentences
+scores = F.cosine_similarity(embeddings.unsqueeze(1), embeddings.unsqueeze(0), dim=-1)
+print(scores.cpu().numpy())
+
+matrix = scores.cpu().numpy()
+tsne = TSNE(n_components=2, perplexity=5, random_state=42, init='random', learning_rate=200)
+vis_dims = tsne.fit_transform(np.array(matrix))
+
+# definisci coordinate x, y per tutti i punti
+x = [x for x,y in vis_dims]
+y = [y for x,y in vis_dims]
+
+# definisci parametri colori, dot shape, ecc.
+colors = df["Color"]
+marker = df["DotShape"]
+scalename = df["Scale"]
+text = df["Item"]+" :"+df["Testo"]
+    
+# plotta grafico di base
+font = {'size' : 10}
+plt.figure(figsize=(10,8))
+plt.rcParams['figure.dpi'] = 600
+for _markers, _colors, _name,_x, _y in zip(marker, colors, scalename, x, y):
+   plt.scatter(_x, _y, s=80, alpha=0.7, marker=_markers, c=_colors, label=_name)
+# aggiungi la legenda
+handles, labels = plt.gca().get_legend_handles_labels()
+by_label = dict(zip(labels, handles))
+plt.legend(by_label.values(), by_label.keys(), loc='center left', bbox_to_anchor=(1, 0.5), fontsize=8)
+# aggiungi le etichette e distanziale opportunamente
+texts = [plt.text(x[i], y[i], text[i], ha='center', va='center', **font) for i in range(len(text))]
+adjustText.adjust_text(texts,expand_text=(0.9,0.9))
+
+```
+

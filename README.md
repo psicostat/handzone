@@ -1,5 +1,13 @@
 # Psicostat Workshops
 
+### 2024-05-23 - AI and Research
+- [Example of using embeddings computed from a (small) model on hugging face](<materials/2024-05-23/embeddings_huggingface.html>)
+
+
+### 2024-05-16 - Power Analysis for study on Reaction Times
+- [Report on power analysis and RT](<materials/2024-05-16/PowerRT.html>)
+
+
 ### 2024-03-27 - Multilevel CFA
 - [Multilevel Confirmatory Factor Analysis: An introduction with examples and code (slides)](<materials/2024-03-27/MCFA-intro.pdf>)
 - [Rmd code](<materials/2024-03-27/Rmd code.zip>)
