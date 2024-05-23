@@ -17,7 +17,7 @@ execute:
 library(openai)
 
 ## set your (secret!) key
-Sys.setenv( OPENAI_API_KEY = "sk-r-PCYeou0PBK9FHF9H31euT3BlbkFJb9SFMHqX8QrKjAOTKYzp" )
+# Sys.setenv( OPENAI_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" )
 
 ## create a chatbot with prompts
 answer = create_chat_completion(
