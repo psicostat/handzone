@@ -16,7 +16,7 @@ execute:
 ## install.packages("openai)
 library(openai)
 
-## set your (secret!) key
+## set your api key
 # Sys.setenv( OPENAI_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" )
 
 ## create a chatbot with prompts
