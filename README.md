@@ -2,6 +2,7 @@
 
 ### 2024-05-23 - AI and Research
 - [Example of using embeddings computed from a (small) model on hugging face](<materials/2024-05-23/embeddings_huggingface.html>)
+- Feats of chatGPT-4o: [1. Crea disegni e figure](<materials/2024-05-23/Feats-of-GPT4/1.%20Immagini.mhtml>); [2. Aiuta un laureando](<materials/2024-05-23/Feats-of-GPT4/2.%20Scrittura%20tesi%20unipd%20psico.mhtml>); [3. Interpreta un forest plot caricato](<materials/2024-05-23/Feats-of-GPT4/3.%20Interpret%20forest%20plot.mhtml>); [4. Interpreta e analizza dati caricati in csv](<materials/2024-05-23/Feats-of-GPT4/4.%20Interpret%20and%20analyze%20data.mhtml>)
 
 
 ### 2024-05-16 - Power Analysis for study on Reaction Times
