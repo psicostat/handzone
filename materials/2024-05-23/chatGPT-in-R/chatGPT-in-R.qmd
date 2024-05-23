@@ -1,0 +1,60 @@
+---
+title: "chatGPT in R"
+subtitle: "x handZone psicostat"
+format: html
+execute:
+  warning: false    # Suppress warnings
+  message: false    # Suppress messages
+  error: false      # Suppress errors
+---
+
+## Example of use of chatGPT using OPENAI API via R
+
+```{r cache=T}
+## https://www.business-science.io/code-tools/2024/05/11/chattr-chatgpt-in-r.html
+
+## install.packages("openai)
+library(openai)
+
+## set your (secret!) key
+Sys.setenv( OPENAI_API_KEY = "sk-r-PCYeou0PBK9FHF9H31euT3BlbkFJb9SFMHqX8QrKjAOTKYzp" )
+
+## create a chatbot with prompts
+answer = create_chat_completion(
+  model = "gpt-3.5-turbo",
+  temperature = 0,
+  messages = list(
+    list(
+      "role" = "system",
+      "content" = "You are a professional translator."
+    ),
+    list(
+      "role" = "user",
+      "content" = "Please translate this text in to English: 
+              La ricerca sulla dislessia sta mettendo sempre più in luce che il disturbo può essere prodotto
+      dalla concomitanza di una serie di fattori e che un assessment completo può includere, oltre alle prove
+      classiche di apprendimento e di intelligenza, anche prove che esaminano il ruolo di questi fattori e, in
+      primo luogo, quello della Memoria di Lavoro Fonologica. Il presente lavoro presenta una nuova prova (span
+      di MLFA) per esaminare la Memoria di Lavoro Fonologica, che include la considerazione dei meccanismi
+      associativi che sembrano particolarmente importanti nell’apprendimento della lettura e offre dati
+      normativi per le fasce scolastiche dalla quarta primaria alla seconda secondaria di I grado. L’agilità
+      della prova e la sua capacità di cogliere aspetti fondamentali della lettura e della dislessia
+      suggeriscono di includerla nell’assessment di routine."
+    )
+  )
+)
+
+## print result
+print( answer )
+```
+
+
+Print only the output text
+
+```{r}
+print( answer$choices$message.content )
+
+```
+
+
+
