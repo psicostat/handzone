@@ -1,6 +1,7 @@
 # Psicostat Workshops
 
 ### 2024-05-23 - AI and Research
+- [Generative Artificial Intelligence - Alberto Testolin (pdf)](<materials/2024-05-23/Testolin_GenAI.pdf>)
 - [Example of using embeddings computed from a (small) model on hugging face](<materials/2024-05-23/embeddings_huggingface.html>)
 - [Example of use of chatGPT inside R](<materials/2024-05-23/chatGPT-in-R/chatGPT-in-R.html>)
 - Feats of chatGPT-4o: [1. Crea figure con diversi stili](<materials/2024-05-23/Feats-of-GPT4/1.%20Immagini.mhtml>); [2. Aiuta laureando accedendo a web](<materials/2024-05-23/Feats-of-GPT4/2.%20Scrittura%20tesi%20unipd%20psico.mhtml>); [3. Interpreta un forest plot caricato](<materials/2024-05-23/Feats-of-GPT4/3.%20Interpret%20forest%20plot.mhtml>); [4. Interpreta e analizza dati caricati in csv](<materials/2024-05-23/Feats-of-GPT4/4.%20Interpret%20and%20analyze%20data.mhtml>); [5. Aiuta a fare codice in diversi linguaggi](<materials/2024-05-23/Feats-of-GPT4/5.%20Help%20with%20coding.mhtml>)
