@@ -1,0 +1,103 @@
+---
+title: "Manifesto Comunità Italiana Data Steward"
+author: "Giulia Calignano"
+include-in-header: images/slidesheader.html
+format: 
+  revealjs:
+    theme: night
+    slide-number: true
+    self-contained-math: true
+    self-contained: true
+    embed-resources: true
+    title-slide-attributes: 
+     data-background-image: "images/psicostatLogo.png"
+     data-background-size: "contain"
+     data-background-opacity: "0.20"
+---
+
+# Comunità Italiana Data Steward
+
+<div style="font-size:60px;">
+**Chi sono, cosa fanno, perché unirsi**
+</div>
+
+## Premesse
+
+> **FAIR** (Findable, Accessible, Interoperable, Reusable)
+
+<div style="font-size:36px;">
+Nella visione della **Commissione Europea** (ma non solo), i dati sono posti al centro dell’innovazione e della ricerca per poter vincere le grandi sfide del futuro\
+
+I dati devono essere: 
+
+- Conservati 
+- Accessibili 
+- Rispettosi dei principi etici e legali
+
+Strumenti cruciali per affrontare sfide globali
+</div>
+
+## La visione europea
+
+<div style="font-size:50px;">
+In questo contesto internazionale, nell’ambito del tavolo di lavoro **ICDI** (Italian Computing and Data Infrastructure) e del progetto europeo **Skills4EOSC** – “Skills for the European Open Science Commons: creating a training ecosystem for Open and FAIR science” nasce la “**Comunità Italiana Data Steward**”.
+</div>
+
+## Il ruolo dei Data Steward
+
+<div style="font-size:28px;">
+> **Data Steward** “*chi possiede ed utilizza nel proprio lavoro le competenze necessarie a gestire e valorizzare i dati della ricerca, per la loro massima fruizione da parte della comunità scientifica e della società, pur tutelando i diritti e gli interessi legittimi di tutti i soggetti coinvolti"*\
+> \
+> Whyte, A., Green, D., Avanço, K., Di Giorgio, S., Gingold, A., Horton, L., Koteska, B., Kyprianou, K., Prnjat, O., Rauste, P., Schirru, L., Sowinski, C., Torres Ramos, G., van Leersum, N., Sharma, C., Méndez, E., & Lazzeri, E. (2023). D2.1 Catalogue of Open Science Career Profiles - Minimum Viable Skillsets (v1.2). Zenodo. <https://doi.org/10.5281/zenodo.8101903> soggetti coinvolti”.
+
+Mappatura nel 2023 dei Professionisti con competenze nella: - Gestione dei dati - Supporto alla ricerca - Valorizzazione dell'informazione scientifica\
+Prima riunione: **7 novembre 2023, Roma**
+</div>
+
+## Scopi e obiettivi strategici
+
+> 1.  Creare opportunità di condivisione e sviluppo di nuove competenze
+> 2.  Supportare l'adozione di buone pratiche per la gestione dei dati della ricerca
+> 3.  Aumentare la consapevolezza del ruolo di Data Steward
+
+ 
+## Organizzazione della CIDS e modalità di partecipazione
+
+
+<div style="font-size:23px;">
+> una partecipazione volontaria, attiva, collaborativa, inclusiva e rispettosa nei confronti di tutte e tutti, a titolo gratuito
+
+1.  Iscrizione mailinglist
+
+2.  Partecipazione agli spazi di lavoro
+
+    2.1. Partecipazione ai Gruppi di Lavoro (GdL) focalizzato su una singola attività o iniziativa. Ogni partecipante alla CIDS può proporre la formazione di un GdL. La costituzione di un nuovo GdL è discussa all’interno del Gruppo di Coordinamento (GdC) prima della sua effettiva attivazione. Ogni GdL deve avere almeno quattro partecipanti ed è coordinato da almeno un chair. I chair dei GdL sono automaticamente membri del GdC per tutta la durata del GdL.
+
+    2.2. Partecipazione al Gruppo di Coordinamento (GdC) che ha il compito di mantenere una visione d’insieme della Comunità e di coordinare le attività portate avanti dai vari GdL. Il GdC è guidato da almeno due chair, anche esterni ai GdL, che si candidano su base volontaria e la cui nomina è soggetta all'approvazione dei membri del GdC.
+</div>
+
+
+## Perché unirsi alla CIDS?
+
+> La necessità di un confronto tra pari, formazione specifica e desiderio di riconoscimento della figura professionale...
+
+Obiettivi: 
+
+- Riconoscere il ruolo dei Data Steward 
+- Promuovere pratiche etiche e FAIR 
+- Creare una rete nazionale attiva e visibile
+
+
+# Vuoi partecipare?
+
+<div style="font-size:50px;">
+Scrivici:\
+`data-stewards@lists.icdi.it`
+</div>
+
+CIDS è: 
+
+- Aperta 
+- Inclusiva 
+- Volontaria
+

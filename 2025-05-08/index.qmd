@@ -1,0 +1,268 @@
+---
+title: "The FAIR Guiding Principles for scientific data management and stewardship"
+author: "Ambra Perugini & Margherita Calderan"
+include-in-header: images/slidesheader.html
+format: 
+  revealjs:
+    theme: simple
+    slide-number: true
+    self-contained-math: true
+    self-contained: true
+    embed-resources: true
+    title-slide-attributes: 
+     data-background-image: "images/psicostatLogo.png"
+     data-background-size: "contain"
+     data-background-opacity: "0.15"
+---
+
+#
+
+<div style="text-align: center;">
+  <img src="images/badges.png" style="width: 70%;" />
+</div>
+
+
+# Why FAIR?
+
+- Growing demands for **transparency** and **reproducibility**
+- Data is often hard to find, access, interpret, or reuse
+- FAIR principles offer a structured solution
+
+> "FAIR = Findable, Accessible, Interoperable, Reusable"
+
+::: {.footnote style="font-size: 0.5em;"}
+
+[Article: The FAIR Guiding Principles for scientific data management and stewardship](https://www.nature.com/articles/sdata201618){target="_blank"}
+
+:::
+
+##
+<div style="display: flex; align-items: center; gap: 25px; white-space: nowrap;">
+<span style="font-size: 40px; font-weight: bold;">European Research Council (European Commission)</span>
+  <img src="images/ec.png" alt="EU Flag" style="height: 45px;">
+  </div>
+
+#### <a href="https://erc.europa.eu/sites/default/files/document/file/ERC_info_document-Open_Research_Data_and_Data_Management_Plans.pdf?utm_source=chatgpt.com" target="_blank">Open Research Data and Data Management Plans</a>
+
+<div style="font-size:30px;">
+- *The ERC embraces the **FAIR** data principles: research data should be findable, accessible,
+interoperable and re-usable*
+- <u>***The ERC expects data underlying publications by ERC grantees to adhere to the FAIR
+principles***</u>
+- *The article by <a href="https://www.nature.com/articles/sdata201618" target="_blank">Wilkinson et al. on “The <b>FAIR</b> Guiding Principles for scientific data management and stewardship”</a> provides a detailed discussion of the <b>FAIR</b> principles*
+- *Grantees should demonstrate that their approach to data management planning is in line
+with the <b>FAIR</b> principles by providing adequate information on these five topics [dataset description; standards and metadata; name and persistent identifier for the datasets; curation and preservation methodology; data sharing methodology]*
+- *[Guidelines on <b>FAIR</b> Data Management in Horizon 2020](https://ec.europa.eu/research/participants/data/ref/h2020/grants_manual/hi/oa_pilot/h2020-hi-oa-data-mgt_en.pdf){target="_blank"}*
+</div>
+
+# Overview of FAIR
+
+- A set of guiding principles
+- Applicable across disciplines
+- Aiming at **machine-readability** and referring to **data stewardship**
+
+
+
+# Findable {.smaller}
+
+**Key ideas:**
+
+- Assign globally unique and persistent identifiers (PIDs) [^1]  
+- Metadata should be rich and indexed in searchable resources
+
+**Example in practice:**
+
+- Use DOIs for datasets
+- Tag datasets with relevant keywords and metadata
+
+\
+
+\
+
+[^1]:  long-lasting references to digital objects, people, or entities that remain stable over time — even if the location (URL) or context of the item changes
+
+## {.smaller}
+
+
+| PID Type                                       | Used For                                                                 | Example                                 |
+| ---------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------- |
+| **DOI** (Digital Object Identifier)            | Publications, datasets, software                                         | `10.5281/zenodo.1234567`                |
+| **ORCID** (Open Researcher and Contributor ID) | Researcher identities                                                    | `https://orcid.org/0000-0002-1825-0097` |
+| **ROR** (Research Organization Registry)       | Institutions/organizations                                               | `https://ror.org/03yrm5c26`             |
+| **ARK** (Archival Resource Key)                | Digital archives, libraries                                              | `ark:/12025/654xz321`                   |
+| **SWHID** (SoftWare Hash IDentifiers)          | Software source code artifacts, source code files, source trees, commits | Example not provided                    |
+
+
+# Accessible
+
+**Key ideas:**
+
+- Use standardized protocols 
+- Metadata remains accessible even if data is restricted
+
+**Example in practice:**
+
+- Publish metadata openly even if data is sensitive (e.g., clinical trials)
+- Use data repositories (e.g., OSF, Zenodo)
+
+
+# Interoperable
+
+**Key ideas:**
+
+- Use standardized vocabularies and formats
+- Data should interoperate with tools and other datasets
+
+**Example in practice:**
+
+- Store data in open formats (CSV, JSON)
+- Use standardized variable naming
+
+# Reusable
+
+**Key ideas:**
+
+- Clear data usage licenses
+- Rich metadata describing context
+
+**Example in practice:**
+
+- Add a Creative Commons license
+- Include documentation, codebooks, analysis scripts
+
+# Understanding Data Licenses
+
+
+ **Why it Matters:**
+
+- Licenses clarify what others can legally do with your data or code
+
+- No license? No one is allowed to reuse your work—even for research
+
+
+## Common License Types {.smaller}
+
+\
+
+ **Creative Commons (CC) — for datasets, docs, media:**
+
+- **CC0 (CC0-1.0)** — No rights reserved, public domain
+
+- **CC-BY (CC-BY-4.0)** — Attribution required
+
+ **Licenses related to softwares**
+
+
+- **MIT** — Simple, permissive, attribution only
+
+- **Apache-2.0** — MIT + patent rights
+
+- **GPL-3.0** — Must share derivative code with same license
+
+- **Unlicense** — Public domain equivalent
+
+ **Most GitHub projects use:** MIT, Apache-2.0, or GPL-3.0
+
+
+## Why Use FAIR Principles in Psychology?
+
+\
+
+- Improves **replicability** and **meta-analyses**
+- Facilitates **collaboration**
+- Encourages **better documentation** and data curation
+
+
+## First steps to become more FAIR
+
+- Use data repositories (e.g., OSF)
+
+- Adopt metadata standards (e.g., JSON)
+
+- Publish protocols and code
+
+- Provide clear licenses
+
+## Tools and Resources 
+
+- [FAIRsharing.org](https://fairsharing.org/){target="_blank"}
+
+- [GitHub Pages Licensing Guide](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/licensing-a-repository){target="_blank"}
+
+- [Open Science Framework](https://osf.io/){target="_blank"}
+
+- [Zenodo](https://zenodo.org/){target="_blank"}
+
+- [Creative Commons Licenses](https://creativecommons.org/){target="_blank"}
+
+- [ChooseALicense.com](https://choosealicense.com/){target="_blank"}
+
+
+
+
+# How are we doing?
+
+------------------------------------------------------------------------
+
+## The daily costs of workaholism
+
+-   **Findable**: *DOI 10.17605/OSF.IO/AWBXJ*
+
+-   **Accessible**: [*https://osf.io/awbxj/*](https://osf.io/awbxj/){target="_blank"}
+
+-   **Interoperable**: *.csv file*
+
+-   **Reusable**: *CC-By Attribution 4.0 International, datadictionary, readme file, scripts*
+
+(half on github and half on osf?)
+
+
+## Domain-level differences in skills and traits change goals
+
+-   **Findable**: *DOI 10.17605/OSF.IO/SWDC2*
+
+-   **Accessible**: [*https://osf.io/swdc2/*](https://osf.io/swdc2/){target="_blank"}
+
+-   **Interoperable**: *.xlsx instead of .csv (also for codebook)*
+
+-   **Reusable**: *CC-By Attribution 4.0 International, codebook (ie. datadictionary), readme file, scripts*
+
+
+## Predictions under sleep restriction
+
+-   **Findable**: *DOI 10.17605/OSF.IO/6FXMH*
+
+-   **Accessible**: <https://osf.io/6fxmh/>{target="_blank"}
+
+-   **Interoperable**: *both .csv and .xlsx*
+
+-   **Reusable**: *CC-By Attribution 4.0 International, renv* *(helps you create reproducible environments for your R projects), but absence of datadictionary and readme*
+
+
+## Auditory and cognitive performance in elderly musicians and nonmusicians
+
+-   **Findable**: <https://doi.org/10.6084/m9.figshare.5402527.v1>{target="_blank"}, *Keywords*
+
+-   **Accessible**: [*figshare*](https://figshare.com/s/0af2a3aeb7860d1c6bbc?file=9306271)
+
+-   **Interoperable**: *.xlsx instead of .csv*
+
+-   **Reusable**: *CC-By Attribution 4.0 International, absence of ReadMe and datadictionary*
+
+
+## Dyslexia Polygenic Scores Show Heightened Prediction of Verbal Working Memory and Arithmetic
+
+The full GWAS summary statistics for the 23andMe discovery data set are available through 23andMe to qualified researchers under an agreement with 23andMe that protects the privacy of the 23andMe participants. Datasets will be made available at no cost for academic use. Please visit <https://research.23andme.com/collaborate/#dataset-access/>{target="_blank"} for more information and to apply to access the data.
+
+
+## Best Practice
+
+<br/>
+
+![](images/no-access.png){fig-align="center"}
+
+##  
+
+<div style="font-size:100px;">
+<a href="manifesto_CDS_Calignano.html" target="_blank">Manifesto Comunità Italiana Data Steward</a>
+</div>
