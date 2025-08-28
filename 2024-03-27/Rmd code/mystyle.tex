@@ -1,0 +1,24 @@
+\setbeamertemplate{page number in head/foot}[totalframenumber]
+\def\begincols{\begin{columns}}
+\def\begincol{\begin{column}}
+\def\endcol{\end{column}}
+\def\endcols{\end{columns}}
+\AtBeginSection{}
+
+% this is to print html tables in pdf
+\usepackage{array}
+\usepackage{longtable}
+\newcommand\textstyleStrongEmphasis[1]{\textbf{#1}}
+\makeatletter
+\newcommand\arraybslash{\let\\\@arraycr}
+
+% this is to reduce the space between chunks & output
+% make console-output smaller:
+  \makeatletter
+\def\verbatim{\tiny\@verbatim \frenchspacing\@vobeyspaces \@xverbatim}
+\makeatother
+\setlength{\parskip}{2pt}
+\setlength{\OuterFrameSep}{0pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt }
+\makeatother
