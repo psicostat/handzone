@@ -1,0 +1,106 @@
+
+Simuliamo 300 dataset con varie caratteristiche (N campionato da $U(50, 500)$) e tau-equivalenza violata in modo abbastanza ampio: 1) loading medio campionato da $U(0.5, 1.1)$; 2) variazione di +/- $U(-0.4, 0.4)$ per ciascun loading. In ogni caso `k = 5`.
+
+Simula dati:
+
+```{r simAlphaVera1, cache=T}
+#| code-fold: true
+#| warning: false
+#| message: false
+#| results: "hide"
+
+niter = 300
+meanLoad = runif(niter,0.5,1.1)
+res1 = data.frame(AlphaCronbach=rep(NA,niter),VarVera=NA,N=NA)
+for(i in 1:niter){
+  N = round(runif(1,50,500))
+  X_true = rnorm(N,0,1)
+  loadings = runif(4,meanLoad[i]-0.4,meanLoad[i]+0.4)
+    df = data.frame(
+         x1 = loadings[1]*X_true + rnorm(N,0,1),
+         x2 = loadings[2]*X_true + rnorm(N,0,1),
+         x3 = loadings[3]*X_true + rnorm(N,0,1),
+         x4 = loadings[4]*X_true + rnorm(N,0,1),
+         x5 = loadings[4]*X_true + rnorm(N,0,1)
+    )
+    model = "X_latent =~ x1+x2+x3+x4+x5"
+    fit = cfa(model, df)
+    res1$AlphaCronbach[i] = psych::alpha(df)$total$raw_alpha
+    res1$VarVera[i] = cor(predict(fit),X_true)^2
+    res1$N[i] = N
+}
+```
+
+Plotta risultati:
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| message: false
+library(ggplot2)
+ggplot(res1,aes(x=VarVera,y=AlphaCronbach))+
+  geom_point(aes(color=N),size=2,alpha=.6)+
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size=1)+
+  scale_color_gradient(low = "deepskyblue", high = "blue4")+
+  coord_cartesian(xlim=c(0.35,0.95),ylim=c(0.35,0.95))+
+  theme(text=element_text(size=20))+
+  scale_x_continuous(breaks=seq(0,1,.1))+
+  scale_y_continuous(breaks=seq(0,1,.1))+
+  xlab("Correlazione vera ^2")+
+  ylab("Alpha di Cronbach")
+
+diff1 = res1$AlphaCronbach - res1$VarVera
+```
+
+L'Alpha di Crobach tende lievemente a sottostimare il valore vero `r round(median(diff1),3)`, intervallo quantile al 90%: (`r round(quantile(diff1,0.05),3)`, `r round(quantile(diff1,0.95),3)`).
+
+Il RMSE (media quadratica degli scarti) è `r round( sqrt(mean(diff1^2)) ,3)`
+
+
+### Ma attenzione: quando N \< ∞, l'Alpha è comunque "imperfetto". Ecco cosa succede, in condizioni simili a prima, RISPETTANDO la tau-equivalenza:
+
+Simula dati:
+
+```{r simAlphaVera2, cache=T}
+#| code-fold: true
+#| warning: false
+#| message: false
+#| results: "hide"
+
+niter = 300
+res2 = data.frame(AlphaCronbach=rep(NA,niter),VarVera=NA,N=NA)
+for(i in 1:niter){
+  meanLoad = runif(1,0.4,1.2)
+  N = round(runif(1,50,500))
+  X_true = rnorm(N,0,1)
+  df = data.frame(
+         x1 = meanLoad*X_true + rnorm(N,0,1),
+         x2 = meanLoad*X_true + rnorm(N,0,1),
+         x3 = meanLoad*X_true + rnorm(N,0,1),
+         x4 = meanLoad*X_true + rnorm(N,0,1),
+         x5 = meanLoad*X_true + rnorm(N,0,1)
+    )
+    model = "X_latent =~ x1+x2+x3+x4+x5"
+    fit = cfa(model, df)
+    res2$AlphaCronbach[i] = psych::alpha(df)$total$raw_alpha
+    res2$VarVera[i] = cor(predict(fit),X_true)^2
+    res2$N[i] = N
+}
+
+ggplot(res2,aes(x=VarVera,y=AlphaCronbach))+
+  geom_point(aes(color=N),size=2,alpha=.6)+
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size=1)+
+  scale_color_gradient(low = "deepskyblue", high = "blue4")+
+  coord_cartesian(xlim=c(0.35,0.95),ylim=c(0.35,0.95))+
+  theme(text=element_text(size=20))+
+  scale_x_continuous(breaks=seq(0,1,.1))+
+  scale_y_continuous(breaks=seq(0,1,.1))+
+  xlab("Correlazione Vera ^2")+
+  ylab("Alpha di Cronbach")
+
+diff2 = res2$AlphaCronbach - res2$VarVera
+```
+
+L'Alpha di Crobach stavolta è in linea col valore vero `r round(median(diff2),3)`, intervallo quantile al 90%: (`r round(quantile(diff2,0.05),3)`, `r round(quantile(diff2,0.95),3)`).
+
+Il RMSE (media quadratica degli scarti) è `r round( sqrt(mean(diff2^2)) ,3)`

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="toffa x psicostat">
+<meta name="dcterms.date" content="2024-10-17">
+
+<title>Alpha di Cronbach, Power e SEM</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="alphaPowerSEM_files/libs/clipboard/clipboard.min.js"></script>
+<script src="alphaPowerSEM_files/libs/quarto-html/quarto.js"></script>
+<script src="alphaPowerSEM_files/libs/quarto-html/popper.min.js"></script>
+<script src="alphaPowerSEM_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="alphaPowerSEM_files/libs/quarto-html/anchor.min.js"></script>
+<link href="alphaPowerSEM_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="alphaPowerSEM_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="alphaPowerSEM_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="alphaPowerSEM_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="alphaPowerSEM_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+</head><body><img src="Figure/psicostat.png" alt="Logo" style="width:40px; margin: 5px auto; display: block; margin-top: 10px;">
+
+
+
+
+
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#alpha-di-cronbach-e-potenza-statistica" id="toc-alpha-di-cronbach-e-potenza-statistica" class="nav-link active" data-scroll-target="#alpha-di-cronbach-e-potenza-statistica">Alpha di Cronbach e potenza statistica</a></li>
+  <li><a href="#il-problema-della-monofattorialità" id="toc-il-problema-della-monofattorialità" class="nav-link" data-scroll-target="#il-problema-della-monofattorialità">Il problema della monofattorialità</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Alpha di Cronbach, Power e SEM</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>toffa x psicostat </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 17, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="alphaBase.html" target="_blank">(torna all’inizio sulle Basi dell’Alpha di Cronbach)</a></p>
+<p><a href="alphaOrdinal.html" target="_blank">(torna alla seconda parte, sui dati ordinali)</a></p>
+<section id="alpha-di-cronbach-e-potenza-statistica" class="level2">
+<h2 class="anchored" data-anchor-id="alpha-di-cronbach-e-potenza-statistica">Alpha di Cronbach e potenza statistica</h2>
+<p>Un buon motivo per tenere d’occhio l’attendibilità è la potenza statistica nella ricerca. Se un costrutto latente è misurato usando item che presentano una maggiore consistenza interna, la potenza sarà maggiore.</p>
+<p>Consideriamo il seguente scenario. Tutto è standardizzato. L’effetto di X su Y è 0.20. Ciò che resta da stabilire sono i loading (e i residui) di X.</p>
+<p><img src="Figure/XYpower.png" class="img-fluid"></p>
+<p>Il codice seguente (clicca sulle scritte sotto per vedere) esegue una <em>power analysis</em> per il coefficiente di regressione evidenziato sopra in rosso. Vengono eseguite 500 iterazioni per varie combinazioni di <em>N</em> (tra <code>50</code> e <code>300</code>) e <em>loading standardizzato</em> (abbiamo considerato <code>.45</code>, <code>.60</code> e <code>.75</code>; questi ultimi implicano poi certe <em>correlazioni medie</em> tra gli item del fattore X e, di conseguenza, certi <em>Alpha di Cronbach</em>).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(parallel)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(psych)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a data frame with the parameters for the power simulation</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>niter <span class="ot">=</span> <span class="dv">500</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>powerSim <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="fu">expand.grid</span>(<span class="at">N =</span> <span class="fu">rep</span>(<span class="fu">seq</span>(<span class="dv">50</span>,<span class="dv">300</span>,<span class="dv">50</span>), <span class="at">each=</span>niter), <span class="at">loadX =</span> <span class="fu">c</span>(.<span class="dv">45</span>,.<span class="dv">60</span>,.<span class="dv">75</span>)))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Detect the number of cores and create a cluster</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>num_cores <span class="ot">&lt;-</span> <span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">1</span>  <span class="co"># Use all but one core to keep system responsive</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>cl <span class="ot">&lt;-</span> <span class="fu">makeCluster</span>(num_cores)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Export necessary libraries and data to the cluster</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">clusterExport</span>(cl, <span class="at">varlist =</span> <span class="fu">c</span>(<span class="st">"lavaan"</span>, <span class="st">"psych"</span>, <span class="st">"powerSim"</span>))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the function that will perform the computation for each row</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>run_simulation <span class="ot">&lt;-</span> <span class="cf">function</span>(i) {</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(lavaan)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">&lt;-</span> powerSim<span class="sc">$</span>N[i]</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  loadX <span class="ot">&lt;-</span> powerSim<span class="sc">$</span>loadX[i]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">=</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  x1 <span class="ot">=</span> loadX <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> loadX<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  x2 <span class="ot">=</span> loadX <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> loadX<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  x3 <span class="ot">=</span> loadX <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> loadX<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  x4 <span class="ot">=</span> loadX <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> loadX<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  Y <span class="ot">=</span> <span class="fl">0.20</span> <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.20</span><span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  y1 <span class="ot">=</span> <span class="fl">0.707</span> <span class="sc">*</span> Y <span class="sc">+</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.707</span><span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  y2 <span class="ot">=</span> <span class="fl">0.707</span> <span class="sc">*</span> Y <span class="sc">+</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.707</span><span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  y3 <span class="ot">=</span> <span class="fl">0.707</span> <span class="sc">*</span> Y <span class="sc">+</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.707</span><span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  y4 <span class="ot">=</span> <span class="fl">0.707</span> <span class="sc">*</span> Y <span class="sc">+</span> <span class="fu">rnorm</span>(N, <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.707</span><span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">=</span> <span class="fu">data.frame</span>(x1, x2, x3, x4, y1, y2, y3, y4)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">=</span> <span class="st">"</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="st">    X =~ x1+x2+x3+x4</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="st">    Y =~ y1+y2+y3+y4</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="st">    Y ~ X</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="st">  "</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">=</span> <span class="fu">sem</span>(model, df)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  su <span class="ot">=</span> <span class="fu">summary</span>(fit)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  pval <span class="ot">=</span> su<span class="sc">$</span>pe[su<span class="sc">$</span>pe<span class="sc">$</span>lhs <span class="sc">==</span> <span class="st">"Y"</span> <span class="sc">&amp;</span> su<span class="sc">$</span>pe<span class="sc">$</span>rhs <span class="sc">==</span> <span class="st">"X"</span>, <span class="st">"pvalue"</span>]</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">pval=</span>pval))</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the parallel computation over the rows of powerSim</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">parLapply</span>(cl, <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(powerSim), run_simulation)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop the cluster after the computation is complete</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="fu">stopCluster</span>(cl)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Store the results in the powerSim data frame</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>powerSim<span class="sc">$</span>pval <span class="ot">&lt;-</span> <span class="fu">sapply</span>(results, <span class="cf">function</span>(res) res<span class="sc">$</span>pval)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the results</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(powerSim)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>powerSim<span class="sc">$</span>power <span class="ot">=</span> powerSim<span class="sc">$</span>pval<span class="sc">&lt;</span><span class="fl">0.05</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>res <span class="ot">=</span> <span class="fu">aggregate</span>(powerSim,<span class="at">by=</span><span class="fu">list</span>(powerSim<span class="sc">$</span>N,<span class="at">loading=</span>powerSim<span class="sc">$</span>loadX),<span class="at">FUN=</span>mean,<span class="at">na.rm=</span>T)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>res</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(l <span class="cf">in</span> <span class="fu">unique</span>(res<span class="sc">$</span>loadX)){</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="fl">1e5</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">x1 =</span> l <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(X), <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> l<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">x2 =</span> l <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(X), <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> l<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">x3 =</span> l <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(X), <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> l<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">x4 =</span> l <span class="sc">*</span> X <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(X), <span class="dv">0</span>, <span class="dv">1</span> <span class="sc">-</span> l<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>  res<span class="sc">$</span>Alpha[res<span class="sc">$</span>loadX<span class="sc">==</span>l] <span class="ot">=</span> <span class="fu">round</span>(psych<span class="sc">::</span><span class="fu">alpha</span>(df)<span class="sc">$</span>total<span class="sc">$</span>raw_alpha,<span class="dv">3</span>)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>La seguente figura riassume i risultati dell’analisi di potenza. Come si vede chiaramente, la potenza dipende sia dall’<em>N</em> che dall’<em>Alpha di Cronbach</em> (in realtà, dai <em>loadings</em> del fattore X).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>AlphaCronbach <span class="ot">=</span> <span class="fu">as.factor</span>(res<span class="sc">$</span>Alpha)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(res,<span class="fu">aes</span>(<span class="at">x=</span>N,<span class="at">y=</span>power,<span class="at">group=</span>AlphaCronbach,<span class="at">color=</span>AlphaCronbach))<span class="sc">+</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="fl">0.80</span>,<span class="at">size=</span><span class="dv">1</span>,<span class="at">linetype=</span><span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size=</span><span class="dv">2</span>,<span class="at">alpha=</span>.<span class="dv">8</span>)<span class="sc">+</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">text=</span><span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">20</span>))<span class="sc">+</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,.<span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">50</span>,<span class="dv">300</span>,<span class="dv">50</span>))<span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"N"</span>)<span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Power"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="alphaPowerSEM_files/figure-html/simPower1Plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="il-problema-della-monofattorialità" class="level2">
+<h2 class="anchored" data-anchor-id="il-problema-della-monofattorialità">Il problema della monofattorialità</h2>
+<p>I veri guai iniziano qui (ma non solo per l’Alpha di Cronbach).</p>
+<p>Il quesito se sotto gli item ci sia un solo fattore, un solo fattore con quale item residuo-correlato, più fattori, più fattori correlati, più fattori con un fattore sovraordinato, o più fattori generali e specifici assieme, è un quesito da risolvere in parte <strong>teoricamente</strong> e in parte considerando gli <strong>indici di fit</strong>. In ogni caso è un problema di misura, e abbiamo bisogno di modelli come le <strong>CFA</strong>.</p>
+<p>Consideriamo il seguente caso:</p>
+<p><img src="Figure/bifactor.png" class="img-fluid"></p>
+<p>Questo è un modello <strong>bifattoriale</strong>. È noto nello studio dell’intelligenza, ma può andare bene in tutti i casi in cui si sospetti che dietro uno stesso item si giochino sia <strong>fattori generali</strong> che <strong>fattori più specifici</strong> contemporaneamente (ed è un caso frequente!). Anche senza entrare troppo nell’aspetto teorico, vedere le cose così è utile per partizionare la varianza degli item tra <strong>varianza dovuta ad aspetti generali</strong> e <strong>varianza dovuta ad aspetti specifici</strong>.</p>
+<p>Questa potrebbe essere una matrice di correlazione prodotta da un modello come questo:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>N <span class="ot">=</span> <span class="fl">1e5</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>g <span class="ot">=</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Fact1 <span class="ot">=</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>Fact2 <span class="ot">=</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">x1 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact1 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">x2 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact1 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x3 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact1 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x4 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact1 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">x5 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact2 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">x6 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact2 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">x7 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact2 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">x8 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact2 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">cor</span>(df),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>     x1   x2   x3   x4   x5   x6   x7   x8
+x1 1.00 0.47 0.47 0.47 0.34 0.34 0.33 0.34
+x2 0.47 1.00 0.47 0.47 0.34 0.34 0.34 0.34
+x3 0.47 0.47 1.00 0.47 0.34 0.34 0.33 0.33
+x4 0.47 0.47 0.47 1.00 0.33 0.33 0.33 0.33
+x5 0.34 0.34 0.34 0.33 1.00 0.47 0.47 0.47
+x6 0.34 0.34 0.34 0.33 0.47 1.00 0.47 0.47
+x7 0.33 0.34 0.33 0.33 0.47 0.47 1.00 0.47
+x8 0.34 0.34 0.33 0.33 0.47 0.47 0.47 1.00</code></pre>
+</div>
+</div>
+<p>In base a questa matrice di correlazione, e ignorando la complessa struttura fattoriale, otterremo:</p>
+<ul>
+<li>L’Alpha di Cronbach di <code>Fact1</code> e di <code>Fact2</code> sono entrambi circa 0.78</li>
+<li>L’Alpha di Cronbach della scala totale sarà 0.838</li>
+</ul>
+<p>Ma hanno senso questi numeri? <strong>NO</strong>. <strong>Qui davvero l’Alpha di Cronbach NON ci serve più. Ma qui il problema diventa pure più “teorico”.</strong></p>
+<p>Quello che vogliamo sapere è quanto le stime fattoriali ottenute partizionando le varianze degli item nei vari fattori siano attendibili. Questo ha ovviamente conseguenze anche per la potenza statistica nel caso in cui <code>g</code>, <code>Fact1</code>, e <code>Fact2</code> vengano usati in un <strong>SEM</strong>, ad esempio come predittori di un certo <em>outcome</em>.</p>
+<p>Questo può essere un modo sensato di procedere (ma… aiutatemi):</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulazione</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>N <span class="ot">=</span> <span class="dv">2000</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>g <span class="ot">=</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>Fact1 <span class="ot">=</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>Fact2 <span class="ot">=</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x1 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact1 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x2 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact1 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">x3 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact1 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">x4 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact1 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">x5 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact2 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">x6 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact2 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">x7 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact2 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">x8 =</span> <span class="fl">0.25</span><span class="sc">*</span>Fact2 <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>g <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="fl">0.5</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Fitting della CFA:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="st">"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">  g =~ x1+x2+x3+x4+x5+x6+x7+x8</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">  Fact1 =~ x1+x2+x3+x4</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">  Fact2 =~ x5+x6+x7+x8</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">"</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">=</span> <span class="fu">cfa</span>(model, df, <span class="at">orthogonal=</span>T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Controllo gli indici di fit:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fitMeasures</span>(fit, <span class="at">fit.measures=</span><span class="fu">c</span>(<span class="st">"rmsea"</span>,<span class="st">"tli"</span>,<span class="st">"cfi"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>rmsea   tli   cfi 
+0.002 1.000 1.000 </code></pre>
+</div>
+</div>
+<p>Computo l’attendibilità usando il pacchetto <code>semTools</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(semTools)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">compRelSEM</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    g Fact1 Fact2 
+0.719 0.223 0.237 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reliability</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               g     Fact1     Fact2
+alpha  0.8442669 0.7987520 0.7804451
+omega  0.8427671 0.5267341 0.5204891
+omega2 0.7186147 0.2226793 0.2372585
+omega3 0.7185828 0.2226897 0.2372580
+avevar        NA        NA        NA</code></pre>
+</div>
+</div>
+<p>(in verità non sono del tutto sicuro: <code>comRelSEM</code> sembra dare spesso stime a casaccio anche con N grandi, e in ogni caso i modelli bifattoriali spesso fanno fatica a convergere)</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

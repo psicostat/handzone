@@ -1,0 +1,232 @@
+---
+title: "Alpha di Cronbach, Power e SEM"
+author: "toffa x psicostat"
+date: "2024-10-17"
+include-in-header: header.html
+format: 
+  html:
+    toc: true      # Add table of contents
+    toc-depth: 2   # Depth of table of contents
+    code-fold: false # Allows code folding
+    code-summary: "Show the code"
+    message: false
+editor: visual
+---
+
+<a href="alphaBase.html" target="_blank">(torna all'inizio sulle Basi dell'Alpha di Cronbach)</a>
+
+<a href="alphaOrdinal.html" target="_blank">(torna alla seconda parte, sui dati ordinali)</a> 
+
+## Alpha di Cronbach e potenza statistica
+
+Un buon motivo per tenere d'occhio l'attendibilità è la potenza statistica nella ricerca. Se un costrutto latente è misurato usando item che presentano una maggiore consistenza interna, la potenza sarà maggiore.
+
+Consideriamo il seguente scenario. Tutto è standardizzato. L'effetto di X su Y è 0.20. Ciò che resta da stabilire sono i loading (e i residui) di X.
+
+![](Figure/XYpower.png)
+
+Il codice seguente (clicca sulle scritte sotto per vedere) esegue una *power analysis* per il coefficiente di regressione evidenziato sopra in rosso. Vengono eseguite 500 iterazioni per varie combinazioni di *N* (tra `50` e `300`) e *loading standardizzato* (abbiamo considerato `.45`, `.60` e `.75`; questi ultimi implicano poi certe *correlazioni medie* tra gli item del fattore X e, di conseguenza, certi *Alpha di Cronbach*).
+
+```{r simPower1, cache=T}
+#| code-fold: true
+#| warning: false
+#| message: false
+#| results: "hide"
+
+library(ggplot2)
+library(parallel)
+library(lavaan)
+library(psych)
+
+# Create a data frame with the parameters for the power simulation
+niter = 500
+powerSim = data.frame(expand.grid(N = rep(seq(50,300,50), each=niter), loadX = c(.45,.60,.75)))
+
+# Detect the number of cores and create a cluster
+num_cores <- detectCores() - 1  # Use all but one core to keep system responsive
+cl <- makeCluster(num_cores)
+
+# Export necessary libraries and data to the cluster
+clusterExport(cl, varlist = c("lavaan", "psych", "powerSim"))
+
+# Define the function that will perform the computation for each row
+run_simulation <- function(i) {
+  library(lavaan)
+  N <- powerSim$N[i]
+  loadX <- powerSim$loadX[i]
+  X = rnorm(N, 0, 1)
+  x1 = loadX * X + rnorm(N, 0, 1 - loadX^2)
+  x2 = loadX * X + rnorm(N, 0, 1 - loadX^2)
+  x3 = loadX * X + rnorm(N, 0, 1 - loadX^2)
+  x4 = loadX * X + rnorm(N, 0, 1 - loadX^2)
+  Y = 0.20 * X + rnorm(N, 0, 1 - 0.20^2)
+  y1 = 0.707 * Y + rnorm(N, 0, 1 - 0.707^2)
+  y2 = 0.707 * Y + rnorm(N, 0, 1 - 0.707^2)
+  y3 = 0.707 * Y + rnorm(N, 0, 1 - 0.707^2)
+  y4 = 0.707 * Y + rnorm(N, 0, 1 - 0.707^2)
+  df = data.frame(x1, x2, x3, x4, y1, y2, y3, y4)
+  model = "
+    X =~ x1+x2+x3+x4
+    Y =~ y1+y2+y3+y4
+    Y ~ X
+  "
+  fit = sem(model, df)
+  su = summary(fit)
+  pval = su$pe[su$pe$lhs == "Y" & su$pe$rhs == "X", "pvalue"]
+  return(list(pval=pval))
+}
+
+# Run the parallel computation over the rows of powerSim
+results <- parLapply(cl, 1:nrow(powerSim), run_simulation)
+
+# Stop the cluster after the computation is complete
+stopCluster(cl)
+
+# Store the results in the powerSim data frame
+powerSim$pval <- sapply(results, function(res) res$pval)
+
+# Print the results
+print(powerSim)
+
+powerSim$power = powerSim$pval<0.05
+
+res = aggregate(powerSim,by=list(powerSim$N,loading=powerSim$loadX),FUN=mean,na.rm=T)
+res
+
+for(l in unique(res$loadX)){
+  X = rnorm(1e5, 0, 1)
+  df = data.frame(
+    x1 = l * X + rnorm(length(X), 0, 1 - l^2),
+    x2 = l * X + rnorm(length(X), 0, 1 - l^2),
+    x3 = l * X + rnorm(length(X), 0, 1 - l^2),
+    x4 = l * X + rnorm(length(X), 0, 1 - l^2)
+  )
+  res$Alpha[res$loadX==l] = round(psych::alpha(df)$total$raw_alpha,3)
+}
+```
+
+La seguente figura riassume i risultati dell'analisi di potenza. Come si vede chiaramente, la potenza dipende sia dall'*N* che dall'*Alpha di Cronbach* (in realtà, dai *loadings* del fattore X).
+
+```{r simPower1Plot, cache=T}
+#| code-fold: true
+#| warning: false
+#| message: false
+#| results: "hide"
+res$AlphaCronbach = as.factor(res$Alpha)
+ggplot(res,aes(x=N,y=power,group=AlphaCronbach,color=AlphaCronbach))+
+  geom_hline(yintercept=0.80,size=1,linetype=2)+
+  geom_line(size=2,alpha=.8)+
+  theme(text=element_text(size=20))+
+  scale_y_continuous(breaks=seq(0,1,.1))+
+  scale_x_continuous(breaks=seq(50,300,50))+
+  xlab("N")+
+  ylab("Power")
+```
+
+## Il problema della monofattorialità
+
+I veri guai iniziano qui (ma non solo per l'Alpha di Cronbach).
+
+Il quesito se sotto gli item ci sia un solo fattore, un solo fattore con quale item residuo-correlato, più fattori, più fattori correlati, più fattori con un fattore sovraordinato, o più fattori generali e specifici assieme, è un quesito da risolvere in parte **teoricamente** e in parte considerando gli **indici di fit**. In ogni caso è un problema di misura, e abbiamo bisogno di modelli come le **CFA**.
+
+Consideriamo il seguente caso:
+
+![](Figure/bifactor.png)
+
+Questo è un modello **bifattoriale**. È noto nello studio dell'intelligenza, ma può andare bene in tutti i casi in cui si sospetti che dietro uno stesso item si giochino sia **fattori generali** che **fattori più specifici** contemporaneamente (ed è un caso frequente!). Anche senza entrare troppo nell'aspetto teorico, vedere le cose così è utile per partizionare la varianza degli item tra **varianza dovuta ad aspetti generali** e **varianza dovuta ad aspetti specifici**.
+
+Questa potrebbe essere una matrice di correlazione prodotta da un modello come questo:
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| message: false
+
+N = 1e5
+g = rnorm(N,0,1)
+Fact1 = rnorm(N,0,1)
+Fact2 = rnorm(N,0,1)
+df = data.frame(
+  x1 = 0.25*Fact1 + 0.4*g + rnorm(N,0,0.5),
+  x2 = 0.25*Fact1 + 0.4*g + rnorm(N,0,0.5),
+  x3 = 0.25*Fact1 + 0.4*g + rnorm(N,0,0.5),
+  x4 = 0.25*Fact1 + 0.4*g + rnorm(N,0,0.5),
+  x5 = 0.25*Fact2 + 0.4*g + rnorm(N,0,0.5),
+  x6 = 0.25*Fact2 + 0.4*g + rnorm(N,0,0.5),
+  x7 = 0.25*Fact2 + 0.4*g + rnorm(N,0,0.5),
+  x8 = 0.25*Fact2 + 0.4*g + rnorm(N,0,0.5)
+)
+round(cor(df),2)
+
+```
+
+In base a questa matrice di correlazione, e ignorando la complessa struttura fattoriale, otterremo:
+
+-   L'Alpha di Cronbach di `Fact1` e di `Fact2` sono entrambi circa `r round(psych::alpha(df[,1:4])$total$raw_alpha,3)`
+-   L'Alpha di Cronbach della scala totale sarà `r round(psych::alpha(df[,1:8])$total$raw_alpha,3)`
+
+Ma hanno senso questi numeri? **NO**. **Qui davvero l'Alpha di Cronbach NON ci serve più. Ma qui il problema diventa pure più "teorico".**
+
+Quello che vogliamo sapere è quanto le stime fattoriali ottenute partizionando le varianze degli item nei vari fattori siano attendibili. Questo ha ovviamente conseguenze anche per la potenza statistica nel caso in cui `g`, `Fact1`, e `Fact2` vengano usati in un **SEM**, ad esempio come predittori di un certo *outcome*.
+
+Questo può essere un modo sensato di procedere (ma... aiutatemi):
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| message: false
+
+# Simulazione
+set.seed(10)
+N = 2000
+g = rnorm(N,0,1)
+Fact1 = rnorm(N,0,1)
+Fact2 = rnorm(N,0,1)
+df = data.frame(
+  x1 = 0.25*Fact1 + 0.4*g + rnorm(N,0,0.5),
+  x2 = 0.25*Fact1 + 0.4*g + rnorm(N,0,0.5),
+  x3 = 0.25*Fact1 + 0.4*g + rnorm(N,0,0.5),
+  x4 = 0.25*Fact1 + 0.4*g + rnorm(N,0,0.5),
+  x5 = 0.25*Fact2 + 0.4*g + rnorm(N,0,0.5),
+  x6 = 0.25*Fact2 + 0.4*g + rnorm(N,0,0.5),
+  x7 = 0.25*Fact2 + 0.4*g + rnorm(N,0,0.5),
+  x8 = 0.25*Fact2 + 0.4*g + rnorm(N,0,0.5)
+)
+```
+
+Fitting della CFA:
+
+```{r}
+#| warning: false
+#| message: false
+
+library(lavaan)
+model = "
+  g =~ x1+x2+x3+x4+x5+x6+x7+x8
+  Fact1 =~ x1+x2+x3+x4
+  Fact2 =~ x5+x6+x7+x8
+"
+fit = cfa(model, df, orthogonal=T)
+```
+
+Controllo gli indici di fit:
+
+```{r}
+#| warning: false
+#| message: false
+
+fitMeasures(fit, fit.measures=c("rmsea","tli","cfi"))
+```
+
+Computo l'attendibilità usando il pacchetto `semTools`:
+
+```{r}
+#| warning: false
+#| message: false
+
+library(semTools)
+compRelSEM(fit)
+reliability(fit)
+```
+
+(in verità non sono del tutto sicuro: `comRelSEM` sembra dare spesso stime a casaccio anche con N grandi, e in ogni caso i modelli bifattoriali spesso fanno fatica a convergere)

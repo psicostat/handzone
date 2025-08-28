@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="toffa x psicostat">
+<meta name="dcterms.date" content="2024-10-17">
+
+<title>Basi sull’Alpha di Cronbach, e Tau-equivalenza</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="alphaBase_files/libs/clipboard/clipboard.min.js"></script>
+<script src="alphaBase_files/libs/quarto-html/quarto.js"></script>
+<script src="alphaBase_files/libs/quarto-html/popper.min.js"></script>
+<script src="alphaBase_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="alphaBase_files/libs/quarto-html/anchor.min.js"></script>
+<link href="alphaBase_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="alphaBase_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="alphaBase_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="alphaBase_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="alphaBase_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+</head><body><img src="Figure/psicostat.png" alt="Logo" style="width:40px; margin: 5px auto; display: block; margin-top: 10px;">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul class="collapse">
+  <li><a href="#formula-dellalpha-di-cronbach" id="toc-formula-dellalpha-di-cronbach" class="nav-link active" data-scroll-target="#formula-dellalpha-di-cronbach">Formula dell’Alpha di Cronbach</a></li>
+  <li><a href="#assunzioni-dellalpha-di-cronbach" id="toc-assunzioni-dellalpha-di-cronbach" class="nav-link" data-scroll-target="#assunzioni-dellalpha-di-cronbach">Assunzioni dell’Alpha di Cronbach</a></li>
+  <li><a href="#significato-dellalpha-di-cronbach" id="toc-significato-dellalpha-di-cronbach" class="nav-link" data-scroll-target="#significato-dellalpha-di-cronbach">Significato dell’Alpha di Cronbach</a></li>
+  <li><a href="#prime-simulazioni-in-r" id="toc-prime-simulazioni-in-r" class="nav-link" data-scroll-target="#prime-simulazioni-in-r">Prime simulazioni in R</a></li>
+  <li><a href="#quanto-è-preciso-lalpha-di-cronbach" id="toc-quanto-è-preciso-lalpha-di-cronbach" class="nav-link" data-scroll-target="#quanto-è-preciso-lalpha-di-cronbach">Quanto è preciso l’Alpha di Cronbach?</a></li>
+  <li><a href="#cosa-succede-se-gli-item-non-sono-tau-equivalenti" id="toc-cosa-succede-se-gli-item-non-sono-tau-equivalenti" class="nav-link" data-scroll-target="#cosa-succede-se-gli-item-non-sono-tau-equivalenti">Cosa succede se gli item non sono tau-equivalenti?</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Basi sull’Alpha di Cronbach, e Tau-equivalenza</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>toffa x psicostat </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 17, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="alphaOrdinal.html" target="_blank">(vai alla seconda parte, sui dati ordinali)</a></p>
+<p><a href="alphaPowerSEM.html" target="_blank">(vai alla terza parte, su SEM e potenza)</a></p>
+<p>L’Alpha di Cronbach (<span class="math inline">\(\alpha\)</span>) ci informa sull’<strong>attendibilità</strong> riflettendo la <strong>consistenza interna</strong> di uno strumento che aggrega più parti <em>(item)</em> di informazione. <em>Attendibilità</em> di cosa? di quanto il <em>Sum score</em> (o comunque una sua trasformazione lineare) approssimi bene il vero tratto latente che vogliamo misurare, date certe assunzioni (più dettagli sotto).</p>
+<p>L’Alpha <strong>non</strong> è un buon indicatore della monofattorialità degli item, ma non è a questo che serve.</p>
+<p><strong>È importante la consistenza interna?</strong> Sì, i motivi per fare attenzione a un tale indice sono almeno due:</p>
+<ul>
+<li>Un’attendibilità maggiore aumenta la precisione delle stime del tratto latente nei <strong>SEM</strong>, e dunque la <strong>potenza statistica</strong> (se stai lavorando su effetti che riguardano le differenze individuali).</li>
+<li>In ambito di <em>assessment</em>, un’attendibilità maggiore aumenta la <strong>precisione delle stime individuali</strong> (anche riducendo la regressione verso la media dovuta al rumore).</li>
+</ul>
+<p>Ma la devo proprio calcolare sempre? <strong>NO</strong>.</p>
+<ul>
+<li>La devi calcolare se stai costruendo un nuovo strumento e, <em>dopo</em> averne stabilito la <em>validità</em> e la <em>struttura fattoriale</em>, vuoi anche un’indicazione dell’<em>attendibilità</em> del suo punteggio totale.</li>
+<li><strong>Se stai usando uno strumento già standardizzato e validato, l’attendibilità da considerare è quella riportata nella validazione originale</strong>.</li>
+</ul>
+<section id="formula-dellalpha-di-cronbach" class="level2">
+<h2 class="anchored" data-anchor-id="formula-dellalpha-di-cronbach">Formula dell’Alpha di Cronbach</h2>
+<p>La formula è:</p>
+<p><span class="math display">\[ \alpha = \frac{k}{k-1} \left(1 - \frac{\sum \sigma^2_i}{\sigma^2_{total}}\right) \]</span></p>
+<p>dove:</p>
+<ul>
+<li><span class="math inline">\(k\)</span> è il numero di item,</li>
+<li><span class="math inline">\(\sigma^2_i\)</span> è la varianza del item <em>i</em>,</li>
+<li><span class="math inline">\(\sigma^2_{total}\)</span> è la varianza del <em>Sum score</em> totale.</li>
+</ul>
+<p>In R lo possiamo calcolare con la funzione implementata in <code>psych::alpha</code>.</p>
+<p>La matrice di correlazione è una statistica sufficiente. Infatti, possiamo calcolare l’Alpha di Cronbach anche con questa formula alternativa:</p>
+<p><span class="math display">\[ \alpha = \frac{k \cdot \overline{r}}{1 + (k-1) \cdot \overline{r}} \]</span></p>
+<p>dove:</p>
+<ul>
+<li><span class="math inline">\(k\)</span> è il numero di item,</li>
+<li><span class="math inline">\(\overline{r}\)</span> è la correlazione media tra tutte le coppie di item (i.e., media della matrice di correlazione tolta la diagonale principale).</li>
+</ul>
+<p>Per gioco, vediamo l’Alpha di Cronbach stimato per diverse combinazioni di <em>Numero di item</em> e <em>Correlazione media tra item</em></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>nr <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="fu">expand.grid</span>(<span class="at">k=</span><span class="dv">2</span><span class="sc">:</span><span class="dv">20</span>,<span class="at">Correl=</span><span class="fu">c</span>(.<span class="dv">1</span>,.<span class="dv">2</span>,.<span class="dv">3</span>,.<span class="dv">4</span>,.<span class="dv">5</span>)),<span class="at">AlphaCronbach=</span><span class="cn">NA</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>nr<span class="sc">$</span>AlphaCronbach <span class="ot">=</span> (nr<span class="sc">$</span>k<span class="sc">*</span>nr<span class="sc">$</span>Correl)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>(nr<span class="sc">$</span>k<span class="dv">-1</span>)<span class="sc">*</span>nr<span class="sc">$</span>Correl)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>nr<span class="sc">$</span>Correl <span class="ot">=</span> <span class="fu">factor</span>(nr<span class="sc">$</span>Correl,<span class="at">levels=</span><span class="fu">rev</span>(<span class="fu">unique</span>(nr<span class="sc">$</span>Correl)))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(nr,<span class="fu">aes</span>(<span class="at">x=</span>k,<span class="at">y=</span>AlphaCronbach,<span class="at">group=</span>Correl,<span class="at">color=</span>Correl))<span class="sc">+</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="fu">c</span>(<span class="fl">0.70</span>,<span class="fl">0.80</span>),<span class="at">size=</span><span class="dv">1</span>,<span class="at">linetype=</span><span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size=</span><span class="dv">2</span>,<span class="at">alpha=</span>.<span class="dv">8</span>)<span class="sc">+</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">text=</span><span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">20</span>))<span class="sc">+</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,.<span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">2</span>,<span class="dv">20</span>,<span class="dv">2</span>))<span class="sc">+</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Numero di item"</span>)<span class="sc">+</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Alpha di Cronbach"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="alphaBase_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="assunzioni-dellalpha-di-cronbach" class="level2">
+<h2 class="anchored" data-anchor-id="assunzioni-dellalpha-di-cronbach">Assunzioni dell’Alpha di Cronbach</h2>
+<p>Affinché l’Alpha sia interpretabile correttamente:</p>
+<ul>
+<li>la <strong>monofattorialità deve essere assunta a priori</strong>;</li>
+<li>gli item devono essere <strong>tau-equivalenti</strong>, cioè avere gli stessi <em>factor loading</em>, cioè contribuire in modo uguale al punteggio fattoriale totale (assumendo che calcoleremo il <strong>Sum score</strong>);</li>
+<li>almeno se si usa la formula qui sopra gli item dovrebbero avere proprietà metriche, cioè essere misurati su un ideale continuo su scala a intervalli e non, ad esempio, su scala Likert/ordinale (ci sono comunque delle formule che la adattano per item ordinali). In realtà, nonostante queste pesanti assunzioni, l’Alpha può spesso va decentemente bene anche di fronte a qualche <em>misfit</em>.</li>
+</ul>
+</section>
+<section id="significato-dellalpha-di-cronbach" class="level2">
+<h2 class="anchored" data-anchor-id="significato-dellalpha-di-cronbach">Significato dell’Alpha di Cronbach</h2>
+<p>Ma in pratica <strong>cosa significa l’Alpha di Cronbach?</strong> Ad esempio, se <span class="math inline">\(\alpha\)</span> <code>= 0.60</code>, cosa significa quel <code>0.60</code>?</p>
+<ul>
+<li><p><code>✘</code> NON corrisponde alla correlazione media tra gli item, sebbene come visto sopra dipenda da essa. (Per fare la prova, basta verificare che l’<span class="math inline">\(\alpha\)</span> è quasi sempre superiore alla correlazione media, e che comunque a parità di correlazione media, <span class="math inline">\(\alpha\)</span> è tanto più quanto più alto è il numero di item <span class="math inline">\(k\)</span>.)</p></li>
+<li><p><code>✔</code> Significa che il <code>60%</code> della varianza del <em>Sum score</em> totale (che valido come <em>factor score</em> in base alle assunzioni di cui sopra) riflette il <strong>vero costrutto/tratto latente</strong> che la scala dovrebbe misurare.</p></li>
+</ul>
+<p>Possiamo dire: <strong>la correlazione tra il <em>Sum score</em> e il vero tratto latente che vogliamo misurare è</strong> <span class="math inline">\(\sqrt\alpha\)</span></p>
+</section>
+<section id="prime-simulazioni-in-r" class="level2">
+<h2 class="anchored" data-anchor-id="prime-simulazioni-in-r">Prime simulazioni in R</h2>
+<p>Generiamo 4 item da un unico costrutto latente X (l’N sia grande)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>N <span class="ot">=</span> <span class="fl">1e5</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>X_true <span class="ot">=</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">x1 =</span> <span class="fl">0.67</span><span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">x2 =</span> <span class="fl">0.67</span><span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x3 =</span> <span class="fl">0.67</span><span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x4 =</span> <span class="fl">0.67</span><span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,] <span class="co"># prime 3 righe</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           x1         x2         x3         x4
+1  0.14923558  0.2893758 -0.5231809  0.5984973
+2  0.18870537 -1.4406944 -1.1143232  0.3770162
+3 -0.07698136 -2.0040180 -0.6122621 -1.9363802</code></pre>
+</div>
+</div>
+<p>Diamo un’occhiata alle correlazioni:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>( <span class="fu">cor</span>(df) ,<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     x1   x2   x3   x4
+x1 1.00 0.31 0.31 0.31
+x2 0.31 1.00 0.31 0.31
+x3 0.31 0.31 1.00 0.31
+x4 0.31 0.31 0.31 1.00</code></pre>
+</div>
+</div>
+<p>Calcoliamo il <em>Sum score</em> (<code>Ss</code>) e vediamo quanto correla col vero tratto latente <code>X_true</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Ss <span class="ot">=</span> <span class="fu">rowSums</span>(df)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(Ss, X_true)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.8022132</code></pre>
+</div>
+</div>
+<p>L’Alpha di Cronbach stima la varianza comune tra Sum score e Vero tratto latente:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>psych<span class="sc">::</span><span class="fu">alpha</span>(df)<span class="sc">$</span>total<span class="sc">$</span>raw_alpha <span class="co"># Alpha di Cronbach</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6432596</code></pre>
+</div>
+</div>
+<p>E infatti la radice quadrata dell’Alpha di Cronbach approssima la correlazione di cui sopra:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Radice quadrata dell'Alpha di Cronbach coincide con la correlazione di cui sopra</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>( psych<span class="sc">::</span><span class="fu">alpha</span>(df)<span class="sc">$</span>total<span class="sc">$</span>raw_alpha )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.8020346</code></pre>
+</div>
+</div>
+<p>Si noti che la soglia critica di accettabilità <span class="math inline">\(\alpha &gt; 0.70\)</span> significa solo che la minima correlazione “accettabile” tra <em>Sum score</em> e Vero tratto latente deve essere 0.83666.</p>
+</section>
+<section id="quanto-è-preciso-lalpha-di-cronbach" class="level2">
+<h2 class="anchored" data-anchor-id="quanto-è-preciso-lalpha-di-cronbach">Quanto è preciso l’Alpha di Cronbach?</h2>
+<p>La funzione <code>psych::alpha</code> ci fornisce anche degli intervalli di confidenza (di default al 95%).</p>
+<p>Comunque, per avere una rappresentazione “grafica”, oltre che per essere sicuri che l’Alpha di Cronbach non sia <em>biased</em>, possiamo fare una simulazione.</p>
+<p>Nella seguente simulazione produciamo 300 dataset con N campionato da <span class="math inline">\(U(50, 500)\)</span>, con <code>k = 5</code> item, che potrebbero essere condizioni “rappresentative” di studi fatti decentemente. La figura mostra l’Alpha di Cronbach stimato in funzione dell’effettiva correlazione tra <em>vero tratto latente</em> e <em>Sum Score</em>. Non sembra male.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>niter <span class="ot">=</span> <span class="dv">300</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>res0 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">AlphaCronbach=</span><span class="fu">rep</span>(<span class="cn">NA</span>,niter),<span class="at">VarVera=</span><span class="cn">NA</span>,<span class="at">N=</span><span class="cn">NA</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>niter){</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  meanLoad <span class="ot">=</span> <span class="fu">runif</span>(<span class="dv">1</span>,<span class="fl">0.4</span>,<span class="fl">1.2</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">runif</span>(<span class="dv">1</span>,<span class="dv">50</span>,<span class="dv">500</span>))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  X_true <span class="ot">=</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">x1 =</span> meanLoad<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">x2 =</span> meanLoad<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">x3 =</span> meanLoad<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">x4 =</span> meanLoad<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">x5 =</span> meanLoad<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">#model = "X_latent =~ x1+x2+x3+x4+x5"</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">#fit = cfa(model, df)</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    res0<span class="sc">$</span>AlphaCronbach[i] <span class="ot">=</span> psych<span class="sc">::</span><span class="fu">alpha</span>(df)<span class="sc">$</span>total<span class="sc">$</span>raw_alpha</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    res0<span class="sc">$</span>VarVera[i] <span class="ot">=</span> <span class="fu">cor</span>(<span class="fu">rowSums</span>(df),X_true)<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    res0<span class="sc">$</span>N[i] <span class="ot">=</span> N</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(res0,<span class="fu">aes</span>(<span class="at">x=</span>VarVera,<span class="at">y=</span>AlphaCronbach))<span class="sc">+</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color=</span>N),<span class="at">size=</span><span class="dv">2</span>,<span class="at">alpha=</span>.<span class="dv">6</span>)<span class="sc">+</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">"deepskyblue"</span>, <span class="at">high =</span> <span class="st">"blue4"</span>)<span class="sc">+</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim=</span><span class="fu">c</span>(<span class="fl">0.35</span>,<span class="fl">0.95</span>),<span class="at">ylim=</span><span class="fu">c</span>(<span class="fl">0.35</span>,<span class="fl">0.95</span>))<span class="sc">+</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">text=</span><span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">20</span>))<span class="sc">+</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,.<span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,.<span class="dv">1</span>))<span class="sc">+</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Correlazione Vera ^2"</span>)<span class="sc">+</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Alpha di Cronbach"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="alphaBase_files/figure-html/simAlphaVera0-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>diff0 <span class="ot">=</span> res0<span class="sc">$</span>AlphaCronbach <span class="sc">-</span> res0<span class="sc">$</span>VarVera</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>L’Alpha di Crobach è in linea col valore vero -0.002, intervallo quantile al 90%: (-0.056, 0.044) (ma non ha molto senso interpretarlo perché l’N è variabile). Il RMSE (media quadratica degli scarti) è 0.04 (anche questo però ha poco senso perché dipende dall’N.)</p>
+</section>
+<section id="cosa-succede-se-gli-item-non-sono-tau-equivalenti" class="level2">
+<h2 class="anchored" data-anchor-id="cosa-succede-se-gli-item-non-sono-tau-equivalenti">Cosa succede se gli item non sono tau-equivalenti?</h2>
+<p>Nella realtà è assai difficile che gli item siano ugualmente rappresentativi del costrutto che misurano (tau-equivalenti). Ma è un problema?</p>
+<p>Nell’esempio qui sotto i loading sono ampiamente diversi, e (dunque) le correlazioni abbastanza variegate (come succede nella realtà). L’N è molto grande per minimizzare l’errore di campionamento.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">10</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>N <span class="ot">=</span> <span class="fl">1e5</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>X_true <span class="ot">=</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">x1 =</span> <span class="fl">0.90</span><span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">x2 =</span> <span class="fl">0.40</span><span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x3 =</span> <span class="fl">1.20</span><span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x4 =</span> <span class="fl">0.60</span><span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>( <span class="fu">cor</span>(df) ,<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     x1   x2   x3   x4
+x1 1.00 0.25 0.52 0.35
+x2 0.25 1.00 0.28 0.19
+x3 0.52 0.28 1.00 0.39
+x4 0.35 0.19 0.39 1.00</code></pre>
+</div>
+</div>
+<p>Ecco la correlazione tra <em>Sum score</em> e vero costrutto latente:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="fu">rowSums</span>(df),X_true) <span class="co"># correlazione "corretta" / vera</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.8409776</code></pre>
+</div>
+</div>
+<p>Ed ecco la stessa correlazione stimata attraverso l’Alpha di Cronbach:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>( psych<span class="sc">::</span><span class="fu">alpha</span>(df)<span class="sc">$</span>total<span class="sc">$</span>raw_alpha ) <span class="co"># correlazione stimata da Alpha di Cronbach</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.8189982</code></pre>
+</div>
+</div>
+<p>(si noti che l’Alpha di Cronbach è 0.670758, quella sopra è la correlazione stimata)</p>
+<p>Dunque, l’Alpha di Cronbach sottostima un po’ l’attendibilità del <em>Sum score</em> quando la tau-equivalenza è violata (in modo abbastanza forte), ma non poi così tanto.</p>
+<p>Meglio di tutto, anche per l’attendibilità, sarebbe usare il <em>Factor Score</em> stimato da una <strong>CFA</strong>, e NON il <em>Sum score</em>, ma anche qui la discrepanza non è poi così ampia:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="st">"X_latent =~ x1+x2+x3+x4"</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">=</span> <span class="fu">cfa</span>(model, df)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>( <span class="fu">cor</span>(<span class="fu">cbind</span>(X_true, <span class="at">SumScore=</span><span class="fu">rowSums</span>(df), <span class="at">FactorScore=</span><span class="fu">as.numeric</span>(<span class="fu">predict</span>(fit)))) ,<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            X_true SumScore FactorScore
+X_true        1.00     0.84        0.86
+SumScore      0.84     1.00        0.98
+FactorScore   0.86     0.98        1.00</code></pre>
+</div>
+</div>
+<p>Per avere un colpo d’occhio, vediamo questa figura. Mostra l’Alpha di Cronbach in funzione della correlazione vera col tratto latente. L’N è molto grande per minimizzare l’errore di campionamento. Di nuovo, <code>k=5</code>. I loading medi sono campionati a diversi livelli in <span class="math inline">\([0.40, 1.20]\)</span>, poi a ciascuno dei 5 loading viene sommato rispettivamente un valore nel vettore <code>(-0.40, -0.25, 0, +0.25, +0.40)</code> per creare violazione della tau-equivalenza.</p>
+<p>Cosa avremmo potuto fare di meglio? Avremmo potuto calcolare la reliability dalla <strong>CFA</strong>!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(semTools)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">reliability</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        X_latent
+alpha  0.6707580
+omega  0.7065681
+omega2 0.7065681
+omega3 0.7064421
+avevar 0.4096177</code></pre>
+</div>
+</div>
+<p>Si noti che questi valori sono giusti: la correlazione stimata in base all’Alpha è proprio 0.8189982, mentre quella stimata in base all’omega è 0.8405761 (si tratta infatti delle radici quadrate dei coefficienti).</p>
+<section id="studio-sistematico-della-violazione-della-tau-equivalenza" class="level3">
+<h3 class="anchored" data-anchor-id="studio-sistematico-della-violazione-della-tau-equivalenza">Studio sistematico della violazione della tau-equivalenza</h3>
+<p>La figura suggerisce che la violazione (abbastanza rilevante) della tau-equivalenza genera una sistematica sottostima dell’attendibilità, ma non in modo esorbitante.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>niter <span class="ot">=</span> <span class="dv">15</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>meanLoad <span class="ot">=</span> <span class="fu">seq</span>(<span class="fl">0.4</span>,<span class="fl">1.2</span>,<span class="at">length.out=</span>niter)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>tauEq <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>res2 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="fu">expand.grid</span>(<span class="at">meanLoad=</span>meanLoad,<span class="at">tauEq=</span>tauEq),<span class="at">AlphaCronbach=</span><span class="fu">rep</span>(<span class="cn">NA</span>,niter),<span class="at">VarVera=</span><span class="cn">NA</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(res2)){</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fl">1e4</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  X_true <span class="ot">=</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(res2<span class="sc">$</span>tauEq[i]<span class="sc">==</span><span class="dv">1</span>){</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>      df <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">x1 =</span> res2<span class="sc">$</span>meanLoad[i]<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">x2 =</span> res2<span class="sc">$</span>meanLoad[i]<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">x3 =</span> res2<span class="sc">$</span>meanLoad[i]<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">x4 =</span> res2<span class="sc">$</span>meanLoad[i]<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">x5 =</span> res2<span class="sc">$</span>meanLoad[i]<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>      df <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">x1 =</span> (res2<span class="sc">$</span>meanLoad[i]<span class="sc">-</span><span class="fl">0.40</span>)<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">x2 =</span> (res2<span class="sc">$</span>meanLoad[i]<span class="sc">-</span><span class="fl">0.25</span>)<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">x3 =</span> (res2<span class="sc">$</span>meanLoad[i])<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">x4 =</span> (res2<span class="sc">$</span>meanLoad[i]<span class="sc">+</span><span class="fl">0.25</span>)<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">x5 =</span> (res2<span class="sc">$</span>meanLoad[i]<span class="sc">+</span><span class="fl">0.40</span>)<span class="sc">*</span>X_true <span class="sc">+</span> <span class="fu">rnorm</span>(N,<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>    model <span class="ot">=</span> <span class="st">"X_latent =~ x1+x2+x3+x4+x5"</span></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>    fit <span class="ot">=</span> <span class="fu">cfa</span>(model, df)</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>    res2<span class="sc">$</span>AlphaCronbach[i] <span class="ot">=</span> psych<span class="sc">::</span><span class="fu">alpha</span>(df)<span class="sc">$</span>total<span class="sc">$</span>raw_alpha</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    res2<span class="sc">$</span>VarVera[i] <span class="ot">=</span> <span class="fu">cor</span>(<span class="fu">predict</span>(fit),X_true)<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    res2<span class="sc">$</span>N[i] <span class="ot">=</span> N</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>diff2 <span class="ot">=</span> res2<span class="sc">$</span>AlphaCronbach <span class="sc">-</span> res2<span class="sc">$</span>VarVera</span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>res2<span class="sc">$</span>tauEquiv. <span class="ot">=</span> <span class="fu">factor</span>(res2<span class="sc">$</span>tauEq,<span class="at">levels=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>),<span class="at">label=</span><span class="fu">c</span>(<span class="st">"yes"</span>,<span class="st">"no"</span>))</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(res2,<span class="fu">aes</span>(<span class="at">x=</span>VarVera,<span class="at">y=</span>AlphaCronbach,<span class="at">color=</span>tauEquiv.))<span class="sc">+</span></span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">size=</span><span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">"#11DDFF"</span>,<span class="st">"#DD7766"</span>))<span class="sc">+</span></span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size=</span><span class="dv">6</span>,<span class="at">alpha=</span>.<span class="dv">8</span>)<span class="sc">+</span></span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">text=</span><span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">20</span>))<span class="sc">+</span></span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Correlazione Vera ^2"</span>)<span class="sc">+</span></span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Alpha di Cronbach"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="alphaBase_files/figure-html/simAlphaVera2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="alphaOrdinal.html" target="_blank">(vai alla seconda parte, sui dati ordinali)</a></p>
+<p><a href="alphaPowerSEM.html" target="_blank">(vai alla terza parte, su SEM e potenza)</a></p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
