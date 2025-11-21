@@ -1,7 +1,7 @@
 ---
 title: "All Interactions Are Wrong (?)"
 subtitle: "part 2: family vs link function"
-author: "toffa et al. x psicostat"
+author: "psicostat"
 include-in-header: figures/slidesheader.html
 format:
   revealjs:

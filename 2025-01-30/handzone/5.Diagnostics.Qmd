@@ -1,6 +1,6 @@
 ---
 title: "Two words on diagnostics"
-author: "toffa et al. x psicostat"
+author: "psicostat"
 include-in-header: figures/slidesheader.html
 format:
   revealjs:
