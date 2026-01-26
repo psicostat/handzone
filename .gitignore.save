@@ -1,3 +1,18 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# R / RStudio
+.Rhistory
+.RData
+.Rproj.user/
+**/.Rhistory
+**/.RData
+
+# Windows
+desktop.ini
+Thumbs.db
+
 <<<<<<< HEAD
 .Rproj.user
 .Rproj.user/
