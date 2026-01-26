@@ -1,3 +1,7 @@
 .Rproj.user
 .Rproj.user/
 HANDZONElist.xlsx.DS_Store
+
+# macOS
+.DS_Store
+**/.DS_Store
