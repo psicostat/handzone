@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Penalized Statistical Models: A Help for Managing Your Overparameterized Model</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Presentazione 16-04_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Presentazione 16-04_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Presentazione 16-04_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Presentazione 16-04_files/libs/quarto-html/popper.min.js"></script>
+<script src="Presentazione 16-04_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Presentazione 16-04_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Presentazione 16-04_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Presentazione 16-04_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Presentazione 16-04_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Presentazione 16-04_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Presentazione 16-04_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Penalized Statistical Models: A Help for Managing Your Overparameterized Model</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="statistical-models-linear-regression" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-models-linear-regression">Statistical models: linear regression</h2>
+<p>We will introduce a glimpse of the theory through linear regression. However, the key concepts are easily extended to more complex contexts, without substantial changes.</p>
+<p>We introduce the notation:</p>
+<ul>
+<li>We observe a sample of <span class="math inline">\(n\)</span> observations;</li>
+<li>For each unit <span class="math inline">\(i\)</span>, we observe a response <span class="math inline">\(y_i\)</span> and some covariates <span class="math inline">\(x_{i1},     x_{i2}, \dots, x_{ip}\)</span>;</li>
+<li>The response can be written as a vector <span class="math inline">\(n \times 1\)</span>, the covariates as a matrix <span class="math inline">\(n \times p\)</span> or as a sequence of vectors <span class="math inline">\(X_1, X_2, \dots, X_p\)</span>.</li>
+</ul>
+<p>The standard linear regression model as the form</p>
+<p><span class="math display">\[\begin{equation*}
+  Y=X_1\beta_1+X_2\beta_2+\dots+X_p\beta_p+\varepsilon
+\end{equation*}\]</span> or in compact form <span class="math display">\[\begin{equation*}
+  Y=X\beta+\varepsilon.
+\end{equation*}\]</span></p>
+<p>Whether you use the likelihood approach or the OLS approach (+ normal errors for statistical inference) the loss function to be minimize is</p>
+<p><span class="math display">\[\begin{equation*}
+\min_{\beta_1, \dots, \beta_p} \sum_{i=1}^{n} (y_i - x_{i1} \beta_1 - \dots - x_{ip} \beta_p)^2
+\end{equation*}\]</span></p>
+<p>which, in compact math formula, can be written as</p>
+<p><span class="math display">\[\begin{equation*}
+\min_{\beta} \sum_{i=1}^{n} (y_i - x_i^T \beta)^2
+\end{equation*}\]</span></p>
+<p>or (this is called euclidean norm)</p>
+<p><span class="math display">\[\begin{equation*}
+\min_{\beta} \|Y - X\beta\|^2.
+\end{equation*}\]</span></p>
+</section>
+<section id="penalized-statistical-models" class="level2">
+<h2 class="anchored" data-anchor-id="penalized-statistical-models">Penalized statistical models</h2>
+<p>Penalized statistical models introduce a penalization on some or all the coefficients. Penalization “reduces” the dimension of the statistical model adopted in a “non-trivial” way. We can find (at least) three motivations to think about the use of penalization:</p>
+<ul>
+<li>when you have too many covariates (even <span class="math inline">\(p &gt; n\)</span>) it can be helpful to do variable selection;</li>
+<li>when you have too many covariates (or they become too many with the interactions) it can be helpful to have the convergence of the model and not inflated standard error;</li>
+<li>when you have cluster effects it can be helpful to have the convergence of the model.</li>
+</ul>
+<p>Later we’ll talk about the limits.</p>
+<p>The minimization problem now has the form</p>
+<p><span class="math display">\[\begin{equation*}
+  \hat{\beta} = \arg\min_{\beta} \left\{ \sum_{i=1}^{n} \left( y_i - \sum_{j=1}^{p} X_{ij}\beta_j \right)^2 + \lambda \sum_{j=1}^{p} |\beta_j|^q \right\}
+\end{equation*}\]</span> or <span class="math display">\[\begin{equation*}
+  \hat{\beta} = \arg\min_{\beta} \left( \|y - X\beta\|_2^2 + \lambda \|\beta\|_q^q \right)
+\end{equation*}\]</span></p>
+<p>Details can be found in the book <em>The elements of statistical learning</em> by Hastie <em>et al.</em>, Section 3.4. The most famous choices of q are</p>
+<ul>
+<li><span class="math inline">\(q=1\)</span> for the Lasso regression;</li>
+<li><span class="math inline">\(q=2\)</span> for the Ridge regression.</li>
+</ul>
+<p><img src="immagine5.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%"> <img src="immagine6.png" class="img-fluid quarto-figure quarto-figure-center" style="width:100.0%"></p>
+<p>What do you do in practice? You shrink the overall magnitude of the coefficients. And, importantly, you can apply the penalization over a subset of all coefficients.</p>
+<p>Problems:</p>
+<ul>
+<li><p>Choice of <span class="math inline">\(\lambda\)</span>, which is a tuning parameter. There is no optimal way of selecting it. The most common option is cross-validation;</p></li>
+<li><p>Regression coefficients are biased (towards zero);</p></li>
+<li><p>Standard errors and p-values are meaningless.</p></li>
+</ul>
+<p>How can we solve that?</p>
+<ul>
+<li>We can avoid shrinking the parameters of interest;</li>
+<li>Use of lasso on all or some of the coefficients. You can fit first the lasso, then refit the usual linear model with only the covariates with non-zero coefficients. Standard errors and p-values are hopefully decent;</li>
+<li>Use of any penalization on nuisance parameters: refit them in the second step as offsets. Standard errors and p-values must be computed with the bootstrap (degrees of freedom are not computed correctly);</li>
+<li>More complex modeling (<em>e.g.</em> Debiased lasso).</li>
+</ul>
+</section>
+<section id="example-taken-from-the-book-of-hastie-et-al." class="level2">
+<h2 class="anchored" data-anchor-id="example-taken-from-the-book-of-hastie-et-al.">Example (taken from the book of Hastie et al.)</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="immagine1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:70.0%"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="immagine2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:70.0%"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="immagine3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:70.0%"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="immagine4.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:70.0%"></p>
+</figure>
+</div>
+<p>We will now see three examples with simple synthetic data and one example with a more complex dataset.</p>
+</section>
+<section id="example-1" class="level2">
+<h2 class="anchored" data-anchor-id="example-1">Example 1:</h2>
+<p>I have <span class="math inline">\(n=50\)</span> observations and <span class="math inline">\(p=30\)</span> confounders, with some non-zero correlations. I want to fit a model with all the confounders. A simple linear model will have inflated variances. A two-step approach can be done in <strong><em>R</em></strong> with</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Data generation</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>corxx <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="co">#equi-correlation for all the covariates</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span> <span class="co">#sample size</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>npar <span class="ot">&lt;-</span> <span class="dv">30</span> <span class="co">#number of parameters</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>mu.vect <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">0</span>, npar)) <span class="co">#mean vector of covariates</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>sigma.mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(corxx, npar, npar ) <span class="co">#covariance matrix of covariates</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(sigma.mat) <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="co">#marginal variances of covariates</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">mvrnorm</span>(n, mu.vect, sigma.mat) <span class="co">#generate covariates</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="fl">0.5</span><span class="sc">*</span>X[,<span class="dv">1</span>]<span class="sc">+</span><span class="fl">0.1</span><span class="sc">*</span>X[,<span class="dv">2</span>],<span class="dv">1</span>) <span class="co">#generate response</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(y, X)  </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dat, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          y         X1         X2          X3         X4         X5         X6
+1  0.195027 -0.7513047 -0.7847502 -0.65633968 -0.9794944 -1.7333508 -0.3217536
+2  1.024221  0.9031126 -0.5620455  0.16919446  1.5691410  1.2298878 -0.4436934
+3 -1.109453  0.8652270 -0.7594987  0.02365446  1.3393481  0.3280117 -0.1172748
+           X7         X8           X9        X10         X11        X12
+1 -1.66559001 -0.1683656 -0.157115861 -1.3388170 -0.25118021 -1.3550652
+2  0.09324333  0.6618651  0.007314936  0.7928728  0.55515775 -0.4715545
+3  0.15833359 -0.3358639 -0.043732787  1.0491039 -0.09200566  1.0176328
+         X13        X14       X15         X16        X17         X18
+1 -0.8320577 -1.3328416 -1.205536 -1.84758501 -0.7567394  0.04305472
+2  0.5697799 -0.2733685  0.154580 -0.51651323  0.1208399  0.77573258
+3  0.1200310 -0.8858488  0.580567 -0.02705449 -0.3056244 -0.50497924
+          X19        X20        X21        X22        X23          X24
+1 -1.77478190 -1.6659225 -0.8372492 -1.7651309 -0.8750392 -1.071093569
+2  0.04422195 -0.8849748  0.1586499  1.2459484  0.5131234  0.009603214
+3  2.39373826 -0.5472525 -0.1552319  0.7285397 -0.2801240 -0.693634610
+          X25        X26         X27        X28        X29         X30
+1 -0.25328003 -0.7314456 -0.10490112 -0.4035598 -1.0030995 -1.57276840
+2  0.19739925  0.5128783 -0.09376999 -0.6809778  1.1735209 -0.06750225
+3  0.09370896 -0.4848770 -0.40626979 -0.5075278  0.1519123  1.96946492</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Linear regression model</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> . , <span class="at">data=</span>dat) </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">summary</span>(mod)<span class="sc">$</span>coefficients, <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Estimate Std. Error     t value  Pr(&gt;|t|)
+(Intercept) -0.08417356  0.1892886 -0.44468367 0.6615725
+X1           0.59200417  0.4009214  1.47660915 0.1561633
+X2          -0.05036193  0.2723518 -0.18491497 0.8552553
+X3           0.12135921  0.2527668  0.48012323 0.6366209
+X4          -0.28893176  0.3146644 -0.91822191 0.3700127
+X5          -0.09148722  0.2610806 -0.35041756 0.7298803
+X6           0.02798985  0.2979442  0.09394325 0.9261378
+X7          -0.26736677  0.1989283 -1.34403558 0.1947671
+X8           0.14293655  0.2251481  0.63485571 0.5330937
+X9          -0.10518780  0.2806447 -0.37480767 0.7119544</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Penalized regression model (glm allowed)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages(glmnet)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># The function glmnet gives the estimates for a grid of values for lambdas</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># The function cv.glmnet makes the choice of lambda for you by cross-validation</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(<span class="at">x =</span> <span class="fu">model.matrix</span>(mod)[,<span class="sc">-</span><span class="dv">1</span>], <span class="co">#design matrix</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y =</span> y, <span class="co">#response vector</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">alpha =</span> <span class="dv">1</span>, <span class="co">#1 for lasso, 0 for ridge, intermediate value for mixture</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                 <span class="at">penalty.factor =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">30</span>)) <span class="co">#change to zero (in the correct indexes) to avoid unwanted penalization.</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">coef</span>(fit, <span class="at">s =</span> <span class="st">"lambda.min"</span>), <span class="dv">10</span>) <span class="co">#s is the lambda (shrinkage) parameter. Options are -) "lambda.1se" largest value of lambda such that error is within 1 standard error of the minimum; -) "lambda.min" value of lambda that gives minimum mean cross-validated error.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>10 x 1 sparse Matrix of class "dgCMatrix"
+             lambda.min
+(Intercept) -0.06361865
+X1           0.18372756
+X2           .         
+X3           0.02043437
+X4           .         
+X5           .         
+X6           0.03489987
+X7           .         
+X8           .         
+X9           .         </code></pre>
+</div>
+</div>
+</section>
+<section id="example-1---simulation" class="level2">
+<h2 class="anchored" data-anchor-id="example-1---simulation">Example 1 - Simulation</h2>
+<p>Imagine the setting before with <span class="math inline">\(5,000\)</span> replies. A simulation study will investigate how <span class="math inline">\(\beta_1=0.5\)</span> and <span class="math inline">\(\beta_2=0.1\)</span> are estimated and tested over repeated samples.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"Sim2.rds"</span>) <span class="co">#upload simulation output</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#average mean without penalization</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">3</span>]],<span class="dv">2</span>,mean),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.507 0.102</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#average mean with penalization</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">4</span>]],<span class="dv">2</span>,mean),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.342 0.048</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection without penalization (alpha=0.01)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">1</span>]],<span class="dv">2</span>,<span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.01</span>)),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.142 0.013</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection with penalization (alpha=0.01)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">2</span>]],<span class="dv">2</span>,<span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.01</span>)),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.315 0.020</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection without penalization (alpha=0.05)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">1</span>]],<span class="dv">2</span>,<span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.05</span>)),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.334 0.057</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection with penalization (alpha=0.05)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">2</span>]],<span class="dv">2</span>,<span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.05</span>)),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.475 0.050</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection without penalization (alpha=0.10)</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">1</span>]],<span class="dv">2</span>,<span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.10</span>)),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.462 0.113</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection with penalization (alpha=0.10)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">2</span>]],<span class="dv">2</span>,<span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.10</span>)),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.558 0.073</code></pre>
+</div>
+</div>
+</section>
+<section id="example-2" class="level2">
+<h2 class="anchored" data-anchor-id="example-2">Example 2:</h2>
+<p>I have <span class="math inline">\(n=50\)</span> observations and <span class="math inline">\(p=4\)</span> confounders, with some non-zero correlations. I want to fit a model with all the interactions, but I am really interested only in marginal effects. I include the interactions to avoid (or at least reduce) possible biases.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Generate data</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>corxx <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>npar <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>mu.vect <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">0</span>, npar))</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>sigma.mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(corxx, npar, npar)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(sigma.mat) <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">mvrnorm</span>(n, mu.vect, sigma.mat)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="fl">0.5</span><span class="sc">*</span>X[,<span class="dv">3</span>]<span class="sc">+</span><span class="fl">0.5</span><span class="sc">*</span>X[,<span class="dv">4</span>]<span class="sc">+</span><span class="fl">0.5</span><span class="sc">*</span>X[,<span class="dv">3</span>]<span class="sc">*</span>X[,<span class="dv">4</span>],<span class="dv">1</span>)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(y, X)  </span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> X1<span class="sc">*</span>X2<span class="sc">*</span>X3<span class="sc">*</span>X4, <span class="at">data=</span>dat) </span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">summary</span>(mod)<span class="sc">$</span>coefficients, <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Estimate Std. Error    t value   Pr(&gt;|t|)
+(Intercept)  0.15144198  0.3315958  0.4567066 0.65078642
+X1           0.16497403  0.3142324  0.5250064 0.60298567
+X2          -0.15259454  0.3913905 -0.3898780 0.69905849
+X3           0.54543530  0.3030768  1.7996604 0.08079421
+X4           0.32902124  0.4186780  0.7858575 0.43739369
+X1:X2        0.16565865  0.3988618  0.4153284 0.68051098
+X1:X3        0.06210847  0.4385336  0.1416276 0.88821001
+X2:X3       -0.05502138  0.3429561 -0.1604327 0.87348964
+X1:X4       -0.12582095  0.3236270 -0.3887839 0.69986018
+X2:X4       -0.05753172  0.4187875 -0.1373769 0.89154322</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Penalization only on random effects (see penalty.factor below)  </span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(<span class="at">x =</span> <span class="fu">model.matrix</span>(mod)[,<span class="sc">-</span><span class="dv">1</span>], <span class="at">y =</span> y, <span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">penalty.factor=</span><span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>),<span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">11</span>)))</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">coef</span>(fit, <span class="at">s =</span> <span class="st">"lambda.min"</span>), <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>10 x 1 sparse Matrix of class "dgCMatrix"
+            lambda.min
+(Intercept)  0.3674564
+X1           0.2052972
+X2          -0.2824104
+X3           0.4701567
+X4           0.7875663
+X1:X2        .        
+X1:X3        .        
+X2:X3        .        
+X1:X4        .        
+X2:X4        .        </code></pre>
+</div>
+</div>
+</section>
+<section id="example-2---simulation" class="level2">
+<h2 class="anchored" data-anchor-id="example-2---simulation">Example 2 - Simulation</h2>
+<p>Imagine the setting above with <span class="math inline">\(5,000\)</span> replies. A simulation study will investigate how one of the main effects (<span class="math inline">\(\beta_a = 0.5\)</span>) is estimated. As above, we have an effect equal to 0.5 of the interaction among the target covariate <span class="math inline">\(X_a\)</span> and another <span class="math inline">\(X_b\)</span> .</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"Sim1.rds"</span>)  <span class="co">#upload simulation output</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co">#average mean without penalization</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(df[[<span class="dv">3</span>]]),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#average mean with penalization</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(df[[<span class="dv">4</span>]]),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.496</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection without penalization (alpha=0.01)</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(df[[<span class="dv">1</span>]] <span class="sc">&lt;</span> <span class="fl">0.01</span>),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.229</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection with penalization (alpha=0.01)</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(df[[<span class="dv">2</span>]] <span class="sc">&lt;</span> <span class="fl">0.01</span>),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.45</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection without penalization (alpha=0.05)</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(df[[<span class="dv">1</span>]] <span class="sc">&lt;</span> <span class="fl">0.05</span>),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.452</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection with penalization (alpha=0.05)</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(df[[<span class="dv">2</span>]] <span class="sc">&lt;</span> <span class="fl">0.05</span>),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.672</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection without penalization (alpha=0.10)</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(df[[<span class="dv">1</span>]] <span class="sc">&lt;</span> <span class="fl">0.10</span>),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.579</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection with penalization (alpha=0.10)</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(df[[<span class="dv">2</span>]] <span class="sc">&lt;</span> <span class="fl">0.10</span>),<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.77</code></pre>
+</div>
+</div>
+</section>
+<section id="example-3" class="level2">
+<h2 class="anchored" data-anchor-id="example-3">Example 3</h2>
+<p>Imagine we have 30 observations, on each we observe 4 repeated measures. A cluster effects model seems appropriate. Code is AI generated :)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plm)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lmerTest)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Data generation</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>n_units <span class="ot">&lt;-</span> <span class="dv">30</span>  <span class="co">#number of units</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>n_times <span class="ot">&lt;-</span> <span class="dv">4</span>   <span class="co">#number of times each subject is observed</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>n_total <span class="ot">&lt;-</span> n_units <span class="sc">*</span> n_times</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>ID <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span>n_units, <span class="at">each =</span> n_times)</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>Time <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span>(n_times <span class="sc">-</span> <span class="dv">1</span>), <span class="at">times =</span> n_units)</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>beta_0 <span class="ot">&lt;-</span> <span class="dv">1</span>      <span class="co">#intercept</span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>beta_time <span class="ot">&lt;-</span> <span class="dv">0</span>    <span class="co">#beta referred to time</span></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>p_x1 <span class="ot">&lt;-</span> <span class="fl">0.3</span>      <span class="co">#first fixed effect</span></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>p_x2 <span class="ot">&lt;-</span> <span class="dv">0</span>       <span class="co">#second fixed effect</span></span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>X1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_total, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>) <span class="co">#first covariate</span></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>X2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_total, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>) <span class="co">#second covariate</span></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>u_i_unique <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_units, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">3</span>) <span class="co">#random effect</span></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>u_i <span class="ot">&lt;-</span> <span class="fu">rep</span>(u_i_unique, <span class="at">each =</span> n_times)</span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>epsilon <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_total, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> beta_0 <span class="sc">+</span> (beta_time <span class="sc">*</span> Time) <span class="sc">+</span> (p_x1 <span class="sc">*</span> X1) <span class="sc">+</span> (p_x2 <span class="sc">*</span> X2) <span class="sc">+</span> u_i <span class="sc">+</span> epsilon <span class="co">#response</span></span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(ID, Time, X1, X2, Y)</span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a><span class="co">#Random effects model</span></span>
+<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a>mod_random <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Y <span class="sc">~</span> Time <span class="sc">+</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> ID), <span class="at">data =</span> df)</span>
+<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod_random)<span class="sc">$</span>coefficients</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Estimate Std. Error       df   t value     Pr(&gt;|t|)
+(Intercept)  1.09051080 0.46467907 34.46837  2.346804 2.481548e-02
+Time        -0.06255288 0.08980437 87.09573 -0.696546 4.879418e-01
+X1           0.48807231 0.11385492 90.81188  4.286792 4.507322e-05
+X2           0.24520467 0.12294394 90.40980  1.994443 4.911585e-02</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Fixed effects model</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>mod_fixed <span class="ot">&lt;-</span> <span class="fu">plm</span>(Y <span class="sc">~</span> Time <span class="sc">+</span> X1 <span class="sc">+</span> X2, </span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">data =</span> df, </span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">index =</span> <span class="fu">c</span>(<span class="st">"ID"</span>), </span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">model =</span> <span class="st">"within"</span>)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod_fixed)<span class="sc">$</span>coefficients</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        Estimate Std. Error    t-value     Pr(&gt;|t|)
+Time -0.06246507 0.08982939 -0.6953746 4.886738e-01
+X1    0.48660659 0.11512550  4.2267490 5.829375e-05
+X2    0.23638187 0.12416859  1.9037171 6.025293e-02</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Penalized fixed effects model + bootstrap for p-values</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>X_mat_full <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(Y <span class="sc">~</span> <span class="fu">factor</span>(ID) <span class="sc">+</span> Time <span class="sc">+</span> X1 <span class="sc">+</span> X2 <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> df)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>cv_fit_full <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(X_mat_full, </span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>                         df<span class="sc">$</span>Y,</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">penalty.factor =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>, n_units), <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">3</span>)), </span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">alpha =</span> <span class="dv">1</span>)</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>id_coefs_full <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">coef</span>(cv_fit_full, <span class="at">s =</span> <span class="st">"lambda.min"</span>))[<span class="fu">paste0</span>(<span class="st">"factor(ID)"</span>, <span class="dv">1</span><span class="sc">:</span>n_units), ]</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>offset_lasso <span class="ot">&lt;-</span> id_coefs_full[df<span class="sc">$</span>ID]</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>mod_full <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> Time <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df, <span class="at">offset =</span> offset_lasso)</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a><span class="co">#Point estimates</span></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(mod_full)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)        Time          X1          X2 
+ 1.25939784 -0.06248594  0.48933779  0.24593163 </code></pre>
+</div>
+</div>
+<p>We use a simple version of the bootstrap to compute the p-values: 1) we fit each time the two-step model on the bootstrapped sample; 2) For each parameter, we have <em>n_boot</em> estimates of each parameter; 3) we compute, for each parameter, how many replies are above and below 0 (tested null hypothesis); 4) the minimum (multiplied by 2) among the two proportions gives the p-value; 5) note that a small correction is applied to avoid a p-value of zero.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co">#bootstrap part (helped by AI)</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>n_boot <span class="ot">&lt;-</span> <span class="dv">200</span>    <span class="co">#number of replicates used for bootstrap p-values</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>unique_ids <span class="ot">&lt;-</span> <span class="fu">unique</span>(df<span class="sc">$</span>ID)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>boot_coefs <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> n_boot, <span class="at">ncol =</span> <span class="dv">2</span>)</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(boot_coefs) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"X1"</span>, <span class="st">"X2"</span>)</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(b <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_boot) {</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>  resampled_ids <span class="ot">&lt;-</span> <span class="fu">sample</span>(unique_ids, n_units, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>  df_boot <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>n_units, <span class="cf">function</span>(j) {</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>    curr <span class="ot">&lt;-</span> df[df<span class="sc">$</span>ID <span class="sc">==</span> resampled_ids[j], ]</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>    curr<span class="sc">$</span>ID <span class="ot">&lt;-</span> j</span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(curr)</span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>    }))</span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a>  X_mat_boot <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(Y <span class="sc">~</span> <span class="fu">factor</span>(ID) <span class="sc">+</span> Time <span class="sc">+</span> X1 <span class="sc">+</span> X2 <span class="sc">-</span> <span class="dv">1</span>, <span class="at">data =</span> df_boot)</span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a>  p_factors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>, n_units), <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">3</span>))</span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">try</span>({cv_fit_boot <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(X_mat_boot, </span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true" tabindex="-1"></a>                                df_boot<span class="sc">$</span>Y, </span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true" tabindex="-1"></a>                                <span class="at">penalty.factor =</span> p_factors, </span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true" tabindex="-1"></a>                                <span class="at">alpha =</span> <span class="dv">1</span>)</span>
+<span id="cb49-23"><a href="#cb49-23" aria-hidden="true" tabindex="-1"></a>      id_coefs <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">coef</span>(cv_fit_boot, <span class="at">s =</span> <span class="st">"lambda.min"</span>))[<span class="fu">paste0</span>(<span class="st">"factor(ID)"</span>, <span class="dv">1</span><span class="sc">:</span>n_units), ]</span>
+<span id="cb49-24"><a href="#cb49-24" aria-hidden="true" tabindex="-1"></a>      df_boot<span class="sc">$</span>offset_lasso <span class="ot">&lt;-</span> id_coefs[df_boot<span class="sc">$</span>ID]</span>
+<span id="cb49-25"><a href="#cb49-25" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb49-26"><a href="#cb49-26" aria-hidden="true" tabindex="-1"></a>      mod_boot <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> Time <span class="sc">+</span> X1 <span class="sc">+</span> X2, <span class="at">data =</span> df_boot, <span class="at">offset =</span> offset_lasso)</span>
+<span id="cb49-27"><a href="#cb49-27" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb49-28"><a href="#cb49-28" aria-hidden="true" tabindex="-1"></a>      boot_coefs[b, ] <span class="ot">&lt;-</span> <span class="fu">coef</span>(mod_boot)[<span class="fu">c</span>(<span class="st">"X1"</span>, <span class="st">"X2"</span>)]</span>
+<span id="cb49-29"><a href="#cb49-29" aria-hidden="true" tabindex="-1"></a>    }, <span class="at">silent =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb49-30"><a href="#cb49-30" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb49-31"><a href="#cb49-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb49-32"><a href="#cb49-32" aria-hidden="true" tabindex="-1"></a>  boot_coefs <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(boot_coefs)</span>
+<span id="cb49-33"><a href="#cb49-33" aria-hidden="true" tabindex="-1"></a>  n_success <span class="ot">&lt;-</span> <span class="fu">nrow</span>(boot_coefs)</span>
+<span id="cb49-34"><a href="#cb49-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb49-35"><a href="#cb49-35" aria-hidden="true" tabindex="-1"></a>  calc_p_val <span class="ot">&lt;-</span> <span class="cf">function</span>(boot_dist) {</span>
+<span id="cb49-36"><a href="#cb49-36" aria-hidden="true" tabindex="-1"></a>    p_up <span class="ot">&lt;-</span> (<span class="fu">sum</span>(boot_dist <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">/</span> (n_success <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb49-37"><a href="#cb49-37" aria-hidden="true" tabindex="-1"></a>    p_down <span class="ot">&lt;-</span> (<span class="fu">sum</span>(boot_dist <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">/</span> (n_success <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb49-38"><a href="#cb49-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb49-39"><a href="#cb49-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="dv">2</span> <span class="sc">*</span> <span class="fu">min</span>(p_up, p_down))</span>
+<span id="cb49-40"><a href="#cb49-40" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb49-41"><a href="#cb49-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb49-42"><a href="#cb49-42" aria-hidden="true" tabindex="-1"></a><span class="co">#Bootstrap p-values  </span></span>
+<span id="cb49-43"><a href="#cb49-43" aria-hidden="true" tabindex="-1"></a><span class="fu">calc_p_val</span>(boot_coefs[, <span class="st">"X1"</span>]);<span class="fu">calc_p_val</span>(boot_coefs[, <span class="st">"X2"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.009950249</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.009950249</code></pre>
+</div>
+</div>
+</section>
+<section id="example-3---simulation" class="level2">
+<h2 class="anchored" data-anchor-id="example-3---simulation">Example 3 - Simulation</h2>
+<p>Imagine the setting before with <span class="math inline">\(500\)</span> replies (bootstrap simulations require time). A simulation study will investigate how <span class="math inline">\(\beta_3=0.5\)</span> and <span class="math inline">\(\beta_2=0\)</span> are estimated and tested over repeated samples.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"Sim3.rds"</span>)  <span class="co">#upload simulation output</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="co">#average mean first coefficient</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">"Random"</span>, <span class="st">"Fixed"</span>, <span class="st">"Penalized"</span>),</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">3</span>]], <span class="dv">2</span>, <span class="cf">function</span>(x)<span class="fu">mean</span>(x)),<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1]     [,2]    [,3]       
+[1,] "Random" "Fixed" "Penalized"
+[2,] "0.307"  "0.307" "0.306"    </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co">#average mean second coefficient</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">"Random"</span>, <span class="st">"Fixed"</span>, <span class="st">"Penalized"</span>),</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">4</span>]], <span class="dv">2</span>, <span class="cf">function</span>(x)<span class="fu">mean</span>(x)),<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1]     [,2]    [,3]       
+[1,] "Random" "Fixed" "Penalized"
+[2,] "0.005"  "0.005" "0.005"    </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection first coefficient (alpha=0.01)</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">"Random"</span>, <span class="st">"Fixed"</span>, <span class="st">"Penalized"</span>),</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">1</span>]], <span class="dv">2</span>, <span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.01</span>)),<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1]     [,2]    [,3]       
+[1,] "Random" "Fixed" "Penalized"
+[2,] "0.594"  "0.586" "0.556"    </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection second coefficient (alpha=0.01)</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">"Random"</span>, <span class="st">"Fixed"</span>, <span class="st">"Penalized"</span>),</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">2</span>]], <span class="dv">2</span>, <span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.01</span>)),<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1]     [,2]    [,3]       
+[1,] "Random" "Fixed" "Penalized"
+[2,] "0.008"  "0.008" "0.012"    </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection first coefficient (alpha=0.05)</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">"Random"</span>, <span class="st">"Fixed"</span>, <span class="st">"Penalized"</span>),</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">1</span>]], <span class="dv">2</span>, <span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.05</span>)),<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1]     [,2]    [,3]       
+[1,] "Random" "Fixed" "Penalized"
+[2,] "0.82"   "0.81"  "0.808"    </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection second coefficient (alpha=0.05)</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">"Random"</span>, <span class="st">"Fixed"</span>, <span class="st">"Penalized"</span>),</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">2</span>]], <span class="dv">2</span>, <span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.05</span>)),<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1]     [,2]    [,3]       
+[1,] "Random" "Fixed" "Penalized"
+[2,] "0.044"  "0.048" "0.06"     </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection first coefficient (alpha=0.10)</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">"Random"</span>, <span class="st">"Fixed"</span>, <span class="st">"Penalized"</span>),</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">1</span>]], <span class="dv">2</span>, <span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.10</span>)),<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1]     [,2]    [,3]       
+[1,] "Random" "Fixed" "Penalized"
+[2,] "0.9"    "0.892" "0.89"     </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co">#proportion of rejection second coefficient (alpha=0.10)</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">"Random"</span>, <span class="st">"Fixed"</span>, <span class="st">"Penalized"</span>),</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(df[[<span class="dv">2</span>]], <span class="dv">2</span>, <span class="cf">function</span>(x)<span class="fu">mean</span>(x <span class="sc">&lt;</span> <span class="fl">0.10</span>)),<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1]     [,2]    [,3]       
+[1,] "Random" "Fixed" "Penalized"
+[2,] "0.1"    "0.102" "0.12"     </code></pre>
+</div>
+</div>
+</section>
+<section id="real-data-in-italiano" class="level2">
+<h2 class="anchored" data-anchor-id="real-data-in-italiano">Real data (in italiano)</h2>
+<p>I nostri dati reali riguardano uno studio che durava 10 giorni lavorativi (2 settimane) in cui diverse variabili venivano misurate in specifici momenti della giornata + altre variabili misurate solo una volta con il questionario preliminare. La variabile target è il workaholism (“dipendenza da lavoro”).</p>
+<p>Le variabili within sono le seguenti (tutte misurate da 1 a 7):</p>
+<ul>
+<li><p><strong>jd</strong> = job demands (carico di lavoro)</p></li>
+<li><p><strong>jc</strong> = job control (autonomia decisionale)</p></li>
+<li><p><strong>sw</strong> = supervisor overwork (es. oggi il mio capo lavorava eccessivamente)</p></li>
+<li><p><strong>wh</strong> = workaholism (è l’outcome che vogliamo predire).</p></li>
+</ul>
+<p>Le variabili between sono queste:</p>
+<ul>
+<li><p><strong>gender</strong> (F/M)</p></li>
+<li><p><strong>age</strong> (years)</p></li>
+<li><p><strong>job.tenure</strong> (years)</p></li>
+<li><p><strong>mw</strong> = meaningful work (punteggio aggregato 1-5)</p></li>
+<li><p><strong>oe</strong> = overwork endorsement (punteggio aggregato 1-5)</p></li>
+<li><p><strong>ji</strong> = job insecurity (punteggio aggregato 1-5)</p></li>
+</ul>
+<p>In totale sono presenti 134 soggetti; il numero di misurazioni per soggetto è variabile (da 1 a 10). In totale si hanno 869 misurazioni.</p>
+<p>Fittiamo i modelli elencati sotto, con le seguenti considerazioni: 1) le variabili within vengono prima centrate sulle rispettive medie; 2) dove viene fatta penalizzazione i p-values sono ottenuti con bootstrap con 1000 ripetizioni (più lento – 5-10 minuti a modello – ma più preciso); 3) nel secondo step di refit, gli effetti di cluster entrano come offsets, mentre quando le interazioni sono penalizzate quelle che “si salvano” vengono stimate nuovamente insieme agli effetti marginali.</p>
+<p>I modelli considerati sono:</p>
+<ul>
+<li><p>Modello ad effetti casuali con solo effetti marginali <em>Rand Univ</em>;</p></li>
+<li><p>Modello ad effetti casuali con interazioni a due delle covariate <em>Rand Int</em>;</p></li>
+<li><p>Modello con effetti di gruppo fissi ma penalizzati, con solo effetti marginali <em>Pen Univ</em>;</p></li>
+<li><p>Modello con effetti di gruppo fissi ma penalizzati, con interazioni a due delle covariate <em>Pen Int</em>;</p></li>
+<li><p>Modello con effetti di gruppo fissi ma penalizzati, con interazioni a due delle covariate penalizzate&nbsp;<em>Pen Int 2</em>.</p></li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>ddf <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"RealData.rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="risultati-coefficienti-effetti-univariati" class="level3">
+<h3 class="anchored" data-anchor-id="risultati-coefficienti-effetti-univariati">Risultati coefficienti effetti univariati</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>ddf<span class="sc">$</span>Est1[,<span class="sc">-</span><span class="dv">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Rand_Univ Rand_Int Pen_Univ Pen_Int Pen_Int_2
+(Intercept)     3.727    4.681    3.362   7.966     3.376
+jd.cmc          0.291   -0.102    0.291  -0.102     0.193
+jc.cmc         -0.047   -0.639   -0.047  -0.642    -0.102
+sw.cmc          0.041    0.505    0.041   0.502     0.250
+genderM         0.176    0.198    0.300  -0.214     0.300
+age            -0.053   -0.015   -0.038  -0.135    -0.039
+job.tenure      0.073    0.424    0.070   0.711     0.069
+mw              0.020    0.719    0.067   0.976     0.067
+oe              0.230    0.229    0.162   0.598     0.163
+ji              0.103   -2.213    0.031  -4.517     0.033</code></pre>
+</div>
+</div>
+</section>
+<section id="p-values-coefficienti-effetti-univariati" class="level3">
+<h3 class="anchored" data-anchor-id="p-values-coefficienti-effetti-univariati">P-values coefficienti effetti univariati</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>ddf<span class="sc">$</span>Pval1[,<span class="sc">-</span><span class="dv">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Rand_Univ Rand_Int Pen_Univ Pen_Int Pen_Int_2
+(Intercept)     0.001    0.562    0.038   0.418     0.521
+jd.cmc          0.000    0.749    0.002   0.717     0.008
+jc.cmc          0.048    0.041    0.068   0.040     0.026
+sw.cmc          0.050    0.044    0.058   0.054     0.018
+genderM         0.338    0.938    0.228   0.957     0.729
+age             0.115    0.958    0.376   0.637     0.651
+job.tenure      0.067    0.499    0.208   0.641     0.687
+mw              0.829    0.521    0.731   0.917     0.973
+oe              0.007    0.843    0.114   0.713     0.731
+ji              0.519    0.322    0.719   0.204     0.843</code></pre>
+</div>
+</div>
+</section>
+<section id="risultati-coefficienti-con-interazioni-a-due" class="level3">
+<h3 class="anchored" data-anchor-id="risultati-coefficienti-con-interazioni-a-due">Risultati coefficienti con interazioni a due</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>ddf<span class="sc">$</span>Est2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Names Rand_Int Pen_Int Pen_Int_2
+1         (Intercept)    4.681   7.966     3.376
+2              jd.cmc   -0.102  -0.102     0.193
+3              jc.cmc   -0.639  -0.642    -0.102
+4              sw.cmc    0.505   0.502      0.25
+5             genderM    0.198  -0.214       0.3
+6                 age   -0.015  -0.135    -0.039
+7          job.tenure    0.424   0.711     0.069
+8                  mw    0.719   0.976     0.067
+9                  oe    0.229   0.598     0.163
+10                 ji   -2.213  -4.517     0.033
+11      jd.cmc:sw.cmc   -0.014  -0.013    -0.012
+12     jd.cmc:genderM   -0.028  -0.028     -0.02
+13  jd.cmc:job.tenure   -0.018  -0.018    -0.008
+14          jd.cmc:oe    0.047   0.047     0.046
+15     jc.cmc:genderM    0.062   0.062     0.082
+16  jc.cmc:job.tenure    0.000   0.000     0.012
+17     sw.cmc:genderM   -0.073  -0.073    -0.059
+18  sw.cmc:job.tenure   -0.014  -0.014    -0.015
+19          sw.cmc:mw   -0.045  -0.044     -0.04
+20         jd.cmc:age    0.013   0.013         .
+21      job.tenure:mw    0.031   0.035         .
+22          jd.cmc:mw   -0.004  -0.004         .
+23          sw.cmc:oe   -0.006  -0.006         .
+24          jd.cmc:ji   -0.011  -0.010         .
+25      jc.cmc:sw.cmc   -0.012  -0.010         .
+26 genderM:job.tenure   -0.113  -0.023         .
+27         jc.cmc:age    0.020   0.020         .
+28         genderM:oe   -0.037   0.146         .
+29          jc.cmc:mw    0.015   0.015         .
+30      jd.cmc:jc.cmc   -0.006  -0.003         .
+31          jc.cmc:ji   -0.021  -0.020         .
+32             age:oe   -0.007  -0.019         .
+33         sw.cmc:age   -0.001  -0.001         .
+34        genderM:age    0.019  -0.031         .
+35      job.tenure:oe    0.044   0.025         .
+36      job.tenure:ji   -0.006  -0.062         .
+37          sw.cmc:ji   -0.073  -0.073         .
+38         genderM:ji    0.068   0.282         .
+39              oe:ji    0.081   0.153         .
+40         genderM:mw   -0.091   0.087         .
+41             age:ji    0.055   0.133         .
+42          jc.cmc:oe    0.007   0.008         .
+43             age:mw   -0.037  -0.040         .
+44              mw:oe   -0.038  -0.107         .
+45              mw:ji    0.138   0.127         .
+46     age:job.tenure   -0.017  -0.022         .</code></pre>
+</div>
+</div>
+</section>
+<section id="p-values-coefficienti-con-interazioni-a-due" class="level3">
+<h3 class="anchored" data-anchor-id="p-values-coefficienti-con-interazioni-a-due">P-values coefficienti con interazioni a due</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>ddf<span class="sc">$</span>Pval2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Names Rand_Int Pen_Int Pen_Int_2
+1         (Intercept)    0.562   0.418     0.521
+2              jd.cmc    0.749   0.717     0.008
+3              jc.cmc    0.041   0.040     0.026
+4              sw.cmc    0.044   0.054     0.018
+5             genderM    0.938   0.957     0.729
+6                 age    0.958   0.637     0.651
+7          job.tenure    0.499   0.641     0.687
+8                  mw    0.521   0.917     0.973
+9                  oe    0.843   0.713     0.731
+10                 ji    0.322   0.204     0.843
+11      jd.cmc:sw.cmc    0.509   0.587     0.911
+12     jd.cmc:genderM    0.604   0.751     0.735
+13  jd.cmc:job.tenure    0.169   0.204     0.513
+14          jd.cmc:oe    0.066   0.054     0.048
+15     jc.cmc:genderM    0.245   0.228      0.14
+16  jc.cmc:job.tenure    0.998   0.881     0.372
+17     sw.cmc:genderM    0.112   0.082     0.158
+18  sw.cmc:job.tenure    0.204   0.166      0.12
+19          sw.cmc:mw    0.066   0.082     0.102
+20         jd.cmc:age    0.193   0.172         .
+21      job.tenure:mw    0.647   0.799         .
+22          jd.cmc:mw    0.874   0.949         .
+23          sw.cmc:oe    0.755   0.729         .
+24          jd.cmc:ji    0.810   0.957         .
+25      jc.cmc:sw.cmc    0.529   0.639         .
+26 genderM:job.tenure    0.283   0.619         .
+27         jc.cmc:age    0.038   0.042         .
+28         genderM:oe    0.852   0.833         .
+29          jc.cmc:mw    0.574   0.551         .
+30      jd.cmc:jc.cmc    0.772   0.879         .
+31          jc.cmc:ji    0.647   0.835         .
+32             age:oe    0.855   0.605         .
+33         sw.cmc:age    0.879   0.979         .
+34        genderM:age    0.812   0.879         .
+35      job.tenure:oe    0.390   0.569         .
+36      job.tenure:ji    0.951   0.597         .
+37          sw.cmc:ji    0.062   0.130         .
+38         genderM:ji    0.856   0.785         .
+39              oe:ji    0.603   0.551         .
+40         genderM:mw    0.704   0.935         .
+41             age:ji    0.475   0.246         .
+42          jc.cmc:oe    0.775   0.683         .
+43             age:mw    0.383   0.831         .
+44              mw:oe    0.678   0.641         .
+45              mw:ji    0.427   0.599         .
+46     age:job.tenure    0.188   0.569         .</code></pre>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
